@@ -1,14 +1,14 @@
 # Agent Communication System
 
 ## エージェント構成
-- **PRESIDENT** (別セッション): 統括責任者
-- **boss1** (multiagent:agents): チームリーダー
-- **worker1,2,3** (multiagent:agents): 実行担当
+- **おじいさん** (別セッション): 統括責任者
+- **桃太郎** (仲間:agents): チームリーダー
+- **お供の犬,猿,雉** (仲間:agents): 実行担当
 
 ## あなたの役割
-- **PRESIDENT**: @instructions/president.md
-- **boss1**: @instructions/boss.md
-- **worker1,2,3**: @instructions/worker.md
+- **おじいさん**: @instructions/president.md
+- **桃太郎**: @instructions/boss.md
+- **お供の犬,猿,雉**: @instructions/otomo.md
 
 ## メッセージ送信
 ```bash
@@ -16,4 +16,4 @@
 ```
 
 ## 基本フロー
-PRESIDENT → boss1 → workers → boss1 → PRESIDENT 
+おじいさん → 桃太郎 → お供たち → 桃太郎 → おじいさん

@@ -18,11 +18,11 @@ get_tmux_indices() {
 # エージェント→tmuxターゲット マッピング
 get_agent_target() {
     case "$1" in
-        "president") echo "president" ;;
-        "boss1"|"worker1"|"worker2"|"worker3")
-            # multiagentセッションのindexを動的に取得
-            if tmux has-session -t multiagent 2>/dev/null; then
-                local indices=($(get_tmux_indices multiagent))
+        "おじいさん") echo "おじいさん" ;;
+        "桃太郎"|"お供の犬"|"お供の猿"|"お供の雉")
+            # 仲間セッションのindexを動的に取得
+            if tmux has-session -t 仲間 2>/dev/null; then
+                local indices=($(get_tmux_indices 仲間))
                 local window_index=${indices[0]}
                 local pane_index=${indices[1]}
 
@@ -31,10 +31,10 @@ get_agent_target() {
 
                 # pane番号を計算
                 case "$1" in
-                    "boss1") echo "multiagent:$window_name.$((pane_index))" ;;
-                    "worker1") echo "multiagent:$window_name.$((pane_index + 1))" ;;
-                    "worker2") echo "multiagent:$window_name.$((pane_index + 2))" ;;
-                    "worker3") echo "multiagent:$window_name.$((pane_index + 3))" ;;
+                    "桃太郎") echo "仲間:$window_name.$((pane_index))" ;;
+                    "お供の犬") echo "仲間:$window_name.$((pane_index + 1))" ;;
+                    "お供の猿") echo "仲間:$window_name.$((pane_index + 2))" ;;
+                    "お供の雉") echo "仲間:$window_name.$((pane_index + 3))" ;;
                 esac
             else
                 echo ""
@@ -53,16 +53,16 @@ show_usage() {
   $0 --list
 
 利用可能エージェント:
-  president - プロジェクト統括責任者
-  boss1     - チームリーダー  
-  worker1   - 実行担当者A
-  worker2   - 実行担当者B
-  worker3   - 実行担当者C
+  おじいさん - プロジェクト統括責任者
+  桃太郎     - チームリーダー
+  お供の犬   - 実行担当者A
+  お供の猿   - 実行担当者B
+  お供の雉   - 実行担当者C
 
 使用例:
-  $0 president "指示書に従って"
-  $0 boss1 "Hello World プロジェクト開始指示"
-  $0 worker1 "作業完了しました"
+  $0 おじいさん "指示書に従って"
+  $0 桃太郎 "Hello World プロジェクト開始指示"
+  $0 お供の犬 "作業完了しました"
 EOF
 }
 
@@ -71,29 +71,29 @@ show_agents() {
     echo "📋 利用可能なエージェント:"
     echo "=========================="
 
-    # presidentセッション確認
-    if tmux has-session -t president 2>/dev/null; then
-        echo "  president → president       (プロジェクト統括責任者)"
+    # おじいさんセッション確認
+    if tmux has-session -t おじいさん 2>/dev/null; then
+        echo "  おじいさん → おじいさん       (プロジェクト統括責任者)"
     else
-        echo "  president → [未起動]        (プロジェクト統括責任者)"
+        echo "  おじいさん → [未起動]        (プロジェクト統括責任者)"
     fi
 
-    # multiagentセッション確認
-    if tmux has-session -t multiagent 2>/dev/null; then
-        local boss1_target=$(get_agent_target "boss1")
-        local worker1_target=$(get_agent_target "worker1")
-        local worker2_target=$(get_agent_target "worker2")
-        local worker3_target=$(get_agent_target "worker3")
+    # 仲間セッション確認
+    if tmux has-session -t 仲間 2>/dev/null; then
+        local momotaro_target=$(get_agent_target "桃太郎")
+        local inu_target=$(get_agent_target "お供の犬")
+        local saru_target=$(get_agent_target "お供の猿")
+        local kiji_target=$(get_agent_target "お供の雉")
 
-        echo "  boss1     → ${boss1_target:-[エラー]}  (チームリーダー)"
-        echo "  worker1   → ${worker1_target:-[エラー]}  (実行担当者A)"
-        echo "  worker2   → ${worker2_target:-[エラー]}  (実行担当者B)"
-        echo "  worker3   → ${worker3_target:-[エラー]}  (実行担当者C)"
+        echo "  桃太郎     → ${momotaro_target:-[エラー]}  (チームリーダー)"
+        echo "  お供の犬   → ${inu_target:-[エラー]}  (実行担当者A)"
+        echo "  お供の猿   → ${saru_target:-[エラー]}  (実行担当者B)"
+        echo "  お供の雉   → ${kiji_target:-[エラー]}  (実行担当者C)"
     else
-        echo "  boss1     → [未起動]        (チームリーダー)"
-        echo "  worker1   → [未起動]        (実行担当者A)"
-        echo "  worker2   → [未起動]        (実行担当者B)"
-        echo "  worker3   → [未起動]        (実行担当者C)"
+        echo "  桃太郎     → [未起動]        (チームリーダー)"
+        echo "  お供の犬   → [未起動]        (実行担当者A)"
+        echo "  お供の猿   → [未起動]        (実行担当者B)"
+        echo "  お供の雉   → [未起動]        (実行担当者C)"
     fi
 }
 
@@ -102,7 +102,7 @@ log_send() {
     local agent="$1"
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    
+
     mkdir -p logs
     echo "[$timestamp] $agent: SENT - \"$message\"" >> logs/send_log.txt
 }
@@ -111,17 +111,17 @@ log_send() {
 send_message() {
     local target="$1"
     local message="$2"
-    
+
     echo "📤 送信中: $target ← '$message'"
-    
+
     # Claude Codeのプロンプトを一度クリア
     tmux send-keys -t "$target" C-c
     sleep 0.3
-    
+
     # メッセージ送信
     tmux send-keys -t "$target" "$message"
     sleep 0.1
-    
+
     # エンター押下
     tmux send-keys -t "$target" C-m
     sleep 0.5
@@ -131,12 +131,12 @@ send_message() {
 check_target() {
     local target="$1"
     local session_name="${target%%:*}"
-    
+
     if ! tmux has-session -t "$session_name" 2>/dev/null; then
         echo "❌ セッション '$session_name' が見つかりません"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -146,45 +146,45 @@ main() {
         show_usage
         exit 1
     fi
-    
+
     # --listオプション
     if [[ "$1" == "--list" ]]; then
         show_agents
         exit 0
     fi
-    
+
     if [[ $# -lt 2 ]]; then
         show_usage
         exit 1
     fi
-    
+
     local agent_name="$1"
     local message="$2"
-    
+
     # エージェントターゲット取得
     local target
     target=$(get_agent_target "$agent_name")
-    
+
     if [[ -z "$target" ]]; then
         echo "❌ エラー: 不明なエージェント '$agent_name'"
         echo "利用可能エージェント: $0 --list"
         exit 1
     fi
-    
+
     # ターゲット確認
     if ! check_target "$target"; then
         exit 1
     fi
-    
+
     # メッセージ送信
     send_message "$target" "$message"
-    
+
     # ログ記録
     log_send "$agent_name" "$message"
-    
+
     echo "✅ 送信完了: $agent_name に '$message'"
-    
+
     return 0
 }
 
-main "$@" 
+main "$@"

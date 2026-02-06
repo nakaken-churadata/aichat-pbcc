@@ -12,7 +12,16 @@
       "Bash(then)",
       "Bash(else)",
       "Bash(tmux show-options:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(then echo \"全員の作業完了を確認（最後の完了者として報告）\")",
+      "Bash(else echo \"他のworkerの完了を待機中...\")",
+      "Bash(fi:*)",
+      "Bash(then echo \"全員完了\")",
+      "Bash(else echo \"待機中\")",
+      "Bash(then echo \"ALL_DONE\")",
+      "Bash(else echo \"WAITING\")",
+      "Bash(git add:*)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }
