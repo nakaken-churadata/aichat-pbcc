@@ -17,4 +17,9 @@ Thumbs.db
 *.swo
 *~
 .vscode/
-.idea/ 
+.idea/
+
+# Next.js
+node_modules/
+.next/
+.env*.local
