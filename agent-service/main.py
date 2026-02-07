@@ -66,17 +66,17 @@ async def chat(request: ChatRequest) -> ChatResponse:
         parts=[genai_types.Part(text=prompt)],
     )
 
-    # Run the agent and collect the final response
+    # Run the agent and collect only the final response
     response_text = ""
     async for event in runner.run_async(
         user_id=USER_ID,
         session_id=session_id,
         new_message=new_message,
     ):
-        if event.content and event.content.parts:
+        if event.is_final_response() and event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:
-                    response_text = part.text
+                    response_text += part.text
 
     return ChatResponse(message=Message(role="model", text=response_text))
 
