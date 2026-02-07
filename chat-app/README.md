@@ -43,6 +43,34 @@ npm run dev
 
 http://localhost:3000 でアプリケーションが起動します。
 
+## Docker でのローカル起動
+
+Docker を使用してローカル環境でアプリケーションを起動できます。
+
+### 1. Docker イメージのビルド
+
+```bash
+docker build -t chat-app .
+```
+
+### 2. コンテナの起動
+
+GEMINI_API_KEY を環境変数として渡してコンテナを起動します：
+
+```bash
+docker run -p 8080:8080 -e GEMINI_API_KEY=your_api_key_here chat-app
+```
+
+### 3. アクセス
+
+http://localhost:8080 でアプリケーションにアクセスできます。
+
+### 注意事項
+
+- `your_api_key_here` の部分を実際の GEMINI API キーに置き換えてください
+- ポート 8080 が他のプロセスで使用されていないことを確認してください
+- コンテナを停止するには `Ctrl + C` を押してください
+
 ## Cloud Run へのデプロイ
 
 ### 前提条件
