@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// GEMINI APIキーをここに設定してください
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE';
+// GEMINI APIキーを環境変数から読み込む
+const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
 
 type Message = {
   role: 'user' | 'assistant';
