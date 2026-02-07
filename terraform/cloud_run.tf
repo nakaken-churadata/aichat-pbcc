@@ -11,13 +11,8 @@ resource "google_cloud_run_v2_service" "chat_app" {
       }
 
       env {
-        name = "GEMINI_API_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.gemini_api_key.secret_id
-            version = "latest"
-          }
-        }
+        name  = "AGENT_SERVICE_URL"
+        value = google_cloud_run_v2_service.agent_service.uri
       }
     }
 
@@ -32,8 +27,3 @@ resource "google_service_account" "cloud_run" {
   display_name = "Cloud Run Service Account for ${var.service_name}"
 }
 
-resource "google_secret_manager_secret_iam_member" "cloud_run_secret_access" {
-  secret_id = google_secret_manager_secret.gemini_api_key.secret_id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.cloud_run.email}"
-}

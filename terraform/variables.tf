@@ -26,3 +26,9 @@ variable "image_tag" {
   type        = string
   default     = "latest"
 }
+
+variable "agent_service_name" {
+  description = "Cloud Run service name for the ADK agent"
+  type        = string
+  default     = "agent-service"
+}
