@@ -32,8 +32,8 @@ get_agent_target() {
                 # pane番号を計算
                 case "$1" in
                     "桃太郎") echo "仲間:$window_name.$((pane_index))" ;;
-                    "お供の犬") echo "仲間:$window_name.$((pane_index + 1))" ;;
-                    "お供の猿") echo "仲間:$window_name.$((pane_index + 2))" ;;
+                    "お供の犬") echo "仲間:$window_name.$((pane_index + 2))" ;;
+                    "お供の猿") echo "仲間:$window_name.$((pane_index + 1))" ;;
                     "お供の雉") echo "仲間:$window_name.$((pane_index + 3))" ;;
                 esac
             else
