@@ -5,6 +5,7 @@ import { useState } from 'react';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  citations?: string[];
 }
 
 export default function Home() {
@@ -36,6 +37,7 @@ export default function Home() {
         const assistantMessage: Message = {
           role: 'assistant',
           content: data.response,
+          citations: data.citations,
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
@@ -86,6 +88,25 @@ export default function Home() {
                 }`}
               >
                 <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                {message.citations && message.citations.length > 0 && (
+                  <div className="mt-2 border-t pt-2">
+                    <p className="text-xs text-gray-500 mb-1">参考サイト:</p>
+                    <ul className="space-y-1">
+                      {message.citations.map((citation, idx) => (
+                        <li key={idx}>
+                          <a
+                            href={citation}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:underline break-all"
+                          >
+                            {citation}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           ))}

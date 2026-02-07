@@ -23,14 +23,36 @@ export async function POST(request: NextRequest) {
 
     // GEMINI API クライアントを初期化
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      tools: [{ googleSearch: {} }],
+    });
 
-    // メッセージを送信
+    // メッセージを送信（Google Search grounding を使用）
     const result = await model.generateContent(message);
     const response = result.response;
     const text = response.text();
 
-    return NextResponse.json({ response: text });
+    // グラウンディングメタデータ（検索結果のURL等）を取得
+    const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+    const searchEntryPoint = groundingMetadata?.searchEntryPoint;
+    const groundingChunks = groundingMetadata?.groundingChunks;
+
+    // レスポンスに引用元URLを含める
+    const citations: string[] = [];
+    if (groundingChunks) {
+      for (const chunk of groundingChunks) {
+        if (chunk.web?.uri) {
+          citations.push(chunk.web.uri);
+        }
+      }
+    }
+
+    return NextResponse.json({
+      response: text,
+      citations: citations.length > 0 ? citations : undefined,
+      searchEntryPoint: searchEntryPoint?.renderedContent,
+    });
   } catch (error) {
     console.error('GEMINI API エラー:', error);
     return NextResponse.json(
