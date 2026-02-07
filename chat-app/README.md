@@ -13,13 +13,21 @@ Next.jsとGoogle Gemini AIを使用したシンプルなチャットアプリケ
 
 ### 1. APIキーの設定
 
-`app/page.tsx` ファイルを開き、`GEMINI_API_KEY` を自分のAPIキーに置き換えてください。
+`.env.local.example` をコピーして `.env.local` ファイルを作成し、自分のAPIキーを設定してください。
 
-```typescript
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE';
+```bash
+cp .env.local.example .env.local
+```
+
+`.env.local` ファイルを編集して、APIキーを設定します：
+
+```bash
+NEXT_PUBLIC_GEMINI_API_KEY=your_actual_api_key_here
 ```
 
 Google AI Studioで無料のAPIキーを取得できます: https://makersuite.google.com/app/apikey
+
+**注意**: `.env.local` ファイルは `.gitignore` に含まれているため、Gitリポジトリには含まれません。
 
 ### 2. 依存関係のインストール
 
@@ -102,15 +110,13 @@ gcloud builds submit --config cloudbuild.yaml
 
 ## 環境変数
 
-本番環境でAPIキーを環境変数として管理する場合：
+### ローカル開発環境
 
-1. `app/page.tsx` を編集して環境変数から読み込むように変更
+上記のセットアップ手順（`.env.local` ファイルの作成）により、ローカル開発環境で環境変数が自動的に読み込まれます。
 
-```typescript
-const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
-```
+### 本番環境（Cloud Run）
 
-2. Cloud Runデプロイ時に環境変数を設定
+Cloud Runにデプロイする際は、環境変数を指定してAPIキーを設定します：
 
 ```bash
 gcloud run deploy chat-app \
@@ -121,6 +127,8 @@ gcloud run deploy chat-app \
   --port 3000 \
   --set-env-vars NEXT_PUBLIC_GEMINI_API_KEY=your_actual_api_key
 ```
+
+または、Cloud Runのコンソールから環境変数を設定することもできます。
 
 ## 技術スタック
 
