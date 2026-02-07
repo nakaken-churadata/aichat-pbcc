@@ -121,6 +121,9 @@ for i in {0..3}; do
     # 作業ディレクトリ設定
     tmux send-keys -t "$PANE_ID" "cd $(pwd)" C-m
 
+    # エージェント役割を環境変数として設定
+    tmux send-keys -t "$PANE_ID" "export AGENT_ROLE='${TITLE}'" C-m
+
     # カラープロンプト設定
     if [ $i -eq 0 ]; then
         # 桃太郎: 赤色
@@ -132,6 +135,7 @@ for i in {0..3}; do
 
     # ウェルカムメッセージ
     tmux send-keys -t "$PANE_ID" "echo '=== ${TITLE} エージェント ==='" C-m
+    tmux send-keys -t "$PANE_ID" "echo '役割: ${TITLE}'" C-m
 done
 
 log_success "✅ 仲間セッション作成完了"
@@ -142,8 +146,10 @@ log_info "👑 おじいさんセッション作成開始..."
 
 tmux new-session -d -s おじいさん
 tmux send-keys -t おじいさん "cd $(pwd)" C-m
+tmux send-keys -t おじいさん "export AGENT_ROLE='おじいさん'" C-m
 set_color_prompt "おじいさん" "おじいさん" "35"
 tmux send-keys -t おじいさん "echo '=== おじいさん セッション ==='" C-m
+tmux send-keys -t おじいさん "echo '役割: おじいさん'" C-m
 tmux send-keys -t おじいさん "echo 'プロジェクト統括責任者'" C-m
 tmux send-keys -t おじいさん "echo '========================'" C-m
 
@@ -187,10 +193,15 @@ echo "     tmux list-panes -t 仲間:agents -F '#{pane_id}' | while read pane; d
 echo "         tmux send-keys -t \"\$pane\" 'claude' C-m"
 echo "     done"
 echo ""
-echo "  3. 📜 指示書確認:"
+echo "  3. 🎯 エージェント役割通知（重要）:"
+echo "     ./init-agents.sh    # 全エージェントに役割を自動通知"
+echo ""
+echo "  4. 📜 指示書確認:"
 echo "     おじいさん: instructions/ojiisan.md"
 echo "     桃太郎: instructions/momotarou.md"
 echo "     お供の犬,猿,雉: instructions/otomo.md"
 echo "     システム構造: CLAUDE.md"
 echo ""
-echo "  4. 🎯 デモ実行: おじいさんに「あなたはおじいさんです。指示書に従って」と入力"
+echo "  5. 🚀 開発作業開始:"
+echo "     おじいさんセッションで作業を依頼してください"
+echo "     例: ./agent-send.sh 桃太郎 \"Dockerfileを作成してほしいのじゃ\""
