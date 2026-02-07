@@ -36,7 +36,7 @@ export default function Home() {
 
     try {
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
       // 会話履歴を作成
       const chatHistory = messages.map((msg) => ({
