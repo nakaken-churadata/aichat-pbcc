@@ -1,0 +1,45 @@
+steps:
+  # Dockerイメージのビルド
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/chat-app:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/chat-app:latest'
+      - '.'
+
+  # Container Registryにプッシュ
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/chat-app:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/chat-app:latest'
+
+  # Cloud Runにデプロイ
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'chat-app'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/chat-app:$COMMIT_SHA'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+
+images:
+  - 'gcr.io/$PROJECT_ID/chat-app:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/chat-app:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
