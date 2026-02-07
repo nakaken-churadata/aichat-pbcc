@@ -6,8 +6,8 @@
 - **お供の犬,猿,雉** (仲間:agents): 実行担当
 
 ## あなたの役割
-- **おじいさん**: @instructions/president.md
-- **桃太郎**: @instructions/boss.md
+- **おじいさん**: @instructions/ojiisan.md
+- **桃太郎**: @instructions/momotarou.md
 - **お供の犬,猿,雉**: @instructions/otomo.md
 
 ## メッセージ送信

@@ -73,8 +73,8 @@ Type directly in おじいさん session:
 ## 📜 About Instructions
 
 Role-specific instruction files for each agent:
-- **おじいさん (Grandpa)**: `instructions/president.md`
-- **桃太郎 (Momotaro)**: `instructions/boss.md`
+- **おじいさん (Grandpa)**: `instructions/ojiisan.md`
+- **桃太郎 (Momotaro)**: `instructions/momotarou.md`
 - **お供の犬,猿,雉 (Companions)**: `instructions/otomo.md`
 
 **Claude Code Reference**: Check system structure in `CLAUDE.md`

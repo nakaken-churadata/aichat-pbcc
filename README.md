@@ -73,8 +73,8 @@ for i in {0..3}; do tmux send-keys -t 仲間:0.$i 'claude' C-m; done
 ## 📜 指示書について
 
 各エージェントの役割別指示書：
-- **おじいさん**: `instructions/president.md`
-- **桃太郎**: `instructions/boss.md`
+- **おじいさん**: `instructions/ojiisan.md`
+- **桃太郎**: `instructions/momotarou.md`
 - **お供の犬,猿,雉**: `instructions/otomo.md`
 
 **Claude Code参照**: `CLAUDE.md` でシステム構造を確認
