@@ -1,0 +1,5 @@
+project_id      = "your-gcp-project-id"
+region          = "asia-northeast1"
+service_name    = "gemini-chat-app"
+repository_name = "chat-app"
+image_tag       = "latest"
