@@ -45,8 +45,8 @@
 ### 0. リポジトリのクローン
 
 ```bash
-git clone https://github.com/nishimoto265/Claude-Code-Communication.git
-cd Claude-Code-Communication
+git clone https://github.com/nakaken-churadata/aichat-pbcc.git
+cd aichat-pbcc
 ```
 
 ### 1. tmux環境構築
