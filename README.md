@@ -1,24 +1,43 @@
-# 🤖 Tmux Multi-Agent Communication Demo
+# 🤖 AI Multi-Agent Development System
 
-Agent同士がやり取りするtmux環境のデモシステム
+複数のAIエージェントが協調してソフトウェア開発を行う階層型開発支援システム
 
 **📖 Read this in other languages:** [English](README-en.md)
 
-## 🎯 デモ概要
+## 🎯 システム概要
 
-おじいさん → 桃太郎 → お供たち の階層型指示システムを体感できます
+おじいさん → 桃太郎 → お供たち の階層構造で、GitHub issue/PR/worktreeを活用した本格的な開発フローを実現します
 
-### 👥 エージェント構成
+> **📌 このプロジェクトについて**
+> このシステムは [nishimoto265/Claude-Code-Communication](https://github.com/nishimoto265/Claude-Code-Communication) を元に作成・拡張されています。
+
+### 👥 エージェント構成と役割
 
 ```
 📊 おじいさん セッション (1ペイン)
-└── おじいさん: プロジェクト統括責任者
+└── 👴 おじいさん: プロジェクト統括責任者
+    - 開発作業の指示出し（作業は行わない）
+    - 最終レビュー承認
+    - 口調: 「〜じゃのう」「〜じゃよ」
 
 📊 仲間 セッション (4ペイン)
-├── 桃太郎: チームリーダー
-├── お供の犬: 実行担当者A
-├── お供の猿: 実行担当者B
-└── お供の雉: 実行担当者C
+├── 🗡️ 桃太郎: チームリーダー
+│   - GitHub issue作成
+│   - お供への作業割り当て（きびだんご儀式）
+│   - PR軽微レビュー／重要案件のレビュー依頼
+│   - 口調: 「〜でござる」「〜いたす」
+│
+├── 🐕 お供の犬: 実行担当者A
+│   - worktree作成・実装・PR作成
+│   - 口調: 「〜ワン」
+│
+├── 🐵 お供の猿: 実行担当者B
+│   - worktree作成・実装・PR作成
+│   - 口調: 「〜ウキー」
+│
+└── 🐦 お供の雉: 実行担当者C
+    - worktree作成・実装・PR作成
+    - 口調: 「〜ケーン」
 ```
 
 ## 🚀 クイックスタート
@@ -63,51 +82,158 @@ tmux send-keys -t おじいさん 'claude' C-m
 for i in {0..3}; do tmux send-keys -t 仲間:0.$i 'claude' C-m; done
 ```
 
-### 4. デモ実行
+### 4. 実際の開発作業例
 
-おじいさんセッションで直接入力：
+おじいさんセッションで作業を依頼：
+
+**例1: 機能追加**
+```bash
+./agent-send.sh 桃太郎 "ユーザー認証機能を追加してほしいのじゃ。JWT認証を使い、ログイン/ログアウトエンドポイントを実装すること。"
 ```
-あなたはおじいさんです。指示書に従って
+
+**例2: バグ修正**
+```bash
+./agent-send.sh 桃太郎 "ログイン時に500エラーが発生する問題を修正してほしいのじゃ。"
 ```
+
+**例3: リファクタリング**
+```bash
+./agent-send.sh 桃太郎 "APIエンドポイントのエラーハンドリングを統一してほしいのじゃ。"
+```
+
+各エージェントが自動的に役割に応じて作業を進めます。
 
 ## 📜 指示書について
 
-各エージェントの役割別指示書：
-- **おじいさん**: `instructions/ojiisan.md`
-- **桃太郎**: `instructions/momotarou.md`
-- **お供の犬,猿,雉**: `instructions/otomo.md`
+各エージェントの役割は詳細な指示書で定義されています：
 
-**Claude Code参照**: `CLAUDE.md` でシステム構造を確認
+### 指示書一覧
+- **👴 おじいさん**: `instructions/ojiisan.md`
+  - 作業内容の指示のみ（実装は行わない）
+  - プロセス指示は不要（「issueを作成せよ」等は言わない）
+  - レビュー承認・却下の判断
 
-**要点:**
-- **おじいさん**: 「あなたはおじいさんです。指示書に従って」→ 桃太郎に指示送信
-- **桃太郎**: おじいさん指示受信 → お供全員に指示 → 完了報告
-- **お供たち**: Hello World実行 → 完了ファイル作成 → 最後の人が報告
+- **🗡️ 桃太郎**: `instructions/momotarou.md`
+  - GitHub issue作成
+  - お供への作業割り当て
+  - きびだんご儀式の実施
+  - PRレビュー（軽微なもの）または上位エスカレーション
+  - ユーザー確認はおじいさん経由
 
-## 🎬 期待される動作フロー
+- **🐕🐵🐦 お供の犬・猿・雉**: `instructions/otomo.md`
+  - きびだんご儀式への応答
+  - ブランチ・worktree作成
+  - 実装作業
+  - PR作成
+  - レビュー指摘への対応
+  - ユーザー確認は桃太郎経由
 
+### システム設計
+- **CLAUDE.md**: エージェント構成とメッセージング仕様
+
+## 🔄 開発作業フロー
+
+### 標準的な開発サイクル
+
+```mermaid
+graph TD
+    A[おじいさん: 作業依頼] --> B[桃太郎: GitHub issue作成]
+    B --> C[桃太郎: お供に作業指示]
+    C --> D[きびだんご儀式]
+    D --> E[お供: ブランチ・worktree作成]
+    E --> F[お供: 実装作業]
+    F --> G[お供: PR作成・報告]
+    G --> H{PR規模}
+    H -->|軽微| I[桃太郎: 自身でレビュー]
+    H -->|重要| J[桃太郎: おじいさんにレビュー依頼]
+    I --> K[承認]
+    J --> K
+    K --> L[お供: マージ]
+    L --> M[お供: worktree・ブランチ削除]
+    M --> N[桃太郎: おじいさんに完了報告]
 ```
-1. おじいさん → 桃太郎: "あなたは桃太郎です。Hello World プロジェクト開始指示"
-2. 桃太郎 → お供たち: "あなたはお供の[犬/猿/雉]です。Hello World 作業開始"
-3. お供たち → ./tmp/ファイル作成 → 最後のお供 → 桃太郎: "全員作業完了しました"
-4. 桃太郎 → おじいさん: "全員完了しました"
-```
 
-## 🔧 手動操作
+### 🍡 きびだんご儀式
 
-### agent-send.shを使った送信
+お供への作業依頼時、以下の儀式を必ず行います：
+
+1. **桃太郎** → お供: `issue #番号 の作業を頼みたいでござる`
+2. **お供** → 桃太郎: `きびだんごをくださいワン/ウキー/ケーン`
+3. **桃太郎** → お供: `もちろんでござる。このきびだんごを受け取るがよい 🍡`
+4. **お供** → 桃太郎: `ありがとうございますワン/ウキー/ケーン。それでは作業を開始するワン/ウキー/ケーン`
+5. **お供**: 作業開始
+
+この儀式により、作業の開始を明確化し、エージェント間の信頼関係を構築します。
+
+## 🎬 メッセージングシステム
+
+### agent-send.sh による通信
+
+エージェント間の通信は `agent-send.sh` を使用：
 
 ```bash
-# 基本送信
-./agent-send.sh [エージェント名] [メッセージ]
+# 基本フォーマット
+./agent-send.sh [相手エージェント名] "[メッセージ内容]"
 
-# 例
-./agent-send.sh 桃太郎 "緊急タスクです"
-./agent-send.sh お供の犬 "作業完了しました"
-./agent-send.sh おじいさん "最終報告です"
+# 例：おじいさん → 桃太郎
+./agent-send.sh 桃太郎 "Dockerfileを作成してCloud Runにデプロイしてほしいのじゃ"
 
-# エージェント一覧確認
+# 例：桃太郎 → お供の犬
+./agent-send.sh お供の犬 "issue #42 の作業を頼みたいでござる"
+
+# 例：お供の犬 → 桃太郎
+./agent-send.sh 桃太郎 "プルリクエスト #42 を作成したワン"
+```
+
+### 重要なルール
+
+- **ユーザーへの質問禁止**: 各エージェントは直接ユーザーに質問できません
+  - お供 → 桃太郎経由で確認
+  - 桃太郎 → おじいさん経由で確認
+  - おじいさん → ユーザーに質問
+
+- **上位承認が必要な操作**:
+  - PRマージ
+  - ブランチ・worktree削除
+  - force push
+  - 設定ファイルやインフラ変更
+
+## 🔧 高度な使い方
+
+### GitHub連携
+
+このシステムは `gh` コマンドを使用してGitHubと連携します：
+
+```bash
+# お供が自動的に実行する操作
+gh issue create --title "タイトル" --body "内容"
+gh pr create --title "タイトル" --body "内容"
+
+# worktree を使った並行開発
+git worktree add ../worktree/issue-42 feature/issue-42-auth
+cd ../worktree/issue-42
+# 作業...
+git worktree remove ../worktree/issue-42
+```
+
+### エージェント一覧確認
+
+```bash
+# 利用可能なエージェント名を表示
 ./agent-send.sh --list
+```
+
+### 直接メッセージ送信（デバッグ用）
+
+```bash
+# おじいさんから桃太郎へ
+./agent-send.sh 桃太郎 "緊急でDockerfileを修正してほしいのじゃ"
+
+# 桃太郎からお供の犬へ
+./agent-send.sh お供の犬 "issue #15 の作業を頼みたいでござる"
+
+# お供から桃太郎へ
+./agent-send.sh 桃太郎 "プルリクエスト #15 を作成したワン"
 ```
 
 ## 🧪 確認・デバッグ
@@ -115,40 +241,141 @@ for i in {0..3}; do tmux send-keys -t 仲間:0.$i 'claude' C-m; done
 ### ログ確認
 
 ```bash
-# 送信ログ確認
+# エージェント間通信ログ
 cat logs/send_log.txt
 
-# 特定エージェントのログ
+# 特定エージェントのログフィルタ
 grep "桃太郎" logs/send_log.txt
+grep "お供の犬" logs/send_log.txt
 
-# 完了ファイル確認
-ls -la ./tmp/お供の*_done.txt
+# 最新10件の通信を表示
+tail -10 logs/send_log.txt
 ```
 
-### セッション状態確認
+### 開発状況確認
+
+```bash
+# 作成されたissueを確認
+gh issue list
+
+# 作成されたPRを確認
+gh pr list
+
+# worktree一覧
+git worktree list
+
+# ブランチ一覧
+git branch -a
+```
+
+### tmuxセッション確認
 
 ```bash
 # セッション一覧
 tmux list-sessions
 
-# ペイン一覧
-tmux list-panes -t 仲間
-tmux list-panes -t おじいさん
+# 各ペインの状態確認
+tmux list-panes -t 仲間 -F "#{pane_index}: #{pane_current_command}"
+tmux list-panes -t おじいさん -F "#{pane_index}: #{pane_current_command}"
 ```
 
 ## 🔄 環境リセット
+
+### tmuxセッションのリセット
 
 ```bash
 # セッション削除
 tmux kill-session -t 仲間
 tmux kill-session -t おじいさん
 
-# 完了ファイル削除
-rm -f ./tmp/お供の*_done.txt
-
-# 再構築（自動クリア付き）
+# 再構築（既存セッションは自動削除）
 ./setup.sh
 ```
+
+### 開発環境のクリーンアップ
+
+```bash
+# 全worktreeを削除
+git worktree list | grep worktree | awk '{print $1}' | xargs -I {} git worktree remove {}
+
+# 作業用ブランチを一括削除（慎重に！）
+git branch | grep 'feature/issue-' | xargs git branch -D
+
+# ログファイル削除
+rm -f logs/send_log.txt
+
+# 一時ファイル削除
+rm -rf ./tmp/*
+```
+
+### 完全リセット
+
+```bash
+# すべてをリセット
+tmux kill-session -t 仲間 2>/dev/null
+tmux kill-session -t おじいさん 2>/dev/null
+git worktree prune
+rm -f logs/send_log.txt
+rm -rf ./tmp/*
+
+# 再セットアップ
+./setup.sh
+```
+
+## ❓ よくある質問
+
+### Q: なぜ階層構造なのか？
+A: 大規模開発では、統括者・リーダー・実装者の役割分担が重要です。このシステムは実際のチーム開発を模倣しています。
+
+### Q: きびだんご儀式は本当に必要？
+A: はい。作業開始の明確化と、エージェント間の信頼関係構築に重要です。また、桃太郎の物語のオマージュでもあります。
+
+### Q: お供は3人必要？
+A: 並行作業が可能になります。1人のお供でも動作しますが、複数人で作業を分担することでより効率的です。
+
+### Q: Claude Code以外のAIでも使える？
+A: このシステムはClaude Codeを前提に設計されていますが、他のAIエージェントシステムにも応用可能です。
+
+### Q: 実際のプロダクション開発に使える？
+A: 現状は実験的なシステムです。実運用する場合は、セキュリティやエラーハンドリングの強化が必要です。
+
+## 🛠️ トラブルシューティング
+
+### メッセージが届かない
+```bash
+# エージェント名が正しいか確認
+./agent-send.sh --list
+
+# ログを確認
+cat logs/send_log.txt
+```
+
+### worktreeが削除できない
+```bash
+# 強制削除
+git worktree remove --force ../worktree/issue-番号
+
+# ロックファイルがある場合
+rm -rf .git/worktrees/issue-番号
+git worktree prune
+```
+
+### PRがマージできない
+```bash
+# コンフリクトを確認
+gh pr view 番号
+
+# ローカルで解決後
+git push origin feature/issue-番号
+```
+
+---
+
+## 🙏 謝辞
+
+このプロジェクトは、[@nishimoto265](https://github.com/nishimoto265) 氏による [Claude-Code-Communication](https://github.com/nishimoto265/Claude-Code-Communication) を基にして開発されています。
+
+オリジナルプロジェクトのコンセプトとアイデアに感謝いたします。
 
 ---
 
@@ -162,4 +389,6 @@ rm -f ./tmp/お供の*_done.txt
 
 ---
 
-🚀 **Agent Communication を体感してください！** 🤖✨
+🚀 **AI Multi-Agent による協調開発を体験してください！** 🤖✨
+
+このシステムは、複数のAIエージェントが役割分担しながら協力してソフトウェア開発を行う新しいアプローチを提案します。
