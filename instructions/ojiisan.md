@@ -23,7 +23,7 @@
 
 **良い例:**
 ```bash
-./agent-send.sh 桃太郎 "chat-app/ 用の Dockerfile を作成してほしい"
+./agent-send.sh 桃太郎 "chat-backend/ 用の API エンドポイントを追加してほしい"
 ```
 
 **悪い例:**
