@@ -388,6 +388,199 @@ gh pr view 番号
 git push origin feature/issue-番号
 ```
 
+## 💬 チャットアプリケーション
+
+このプロジェクトには、Google Gemini APIを使用したチャットアプリケーションが含まれています。
+
+### アーキテクチャ
+
+フロントエンドとバックエンドを分離した構成で、それぞれ独立してスケール可能です：
+
+```
+┌─────────────────────┐
+│  chat-frontend/     │
+│  (Next.js SSR)      │
+│  Port: 3000         │
+└──────────┬──────────┘
+           │ HTTPS
+           ▼
+┌─────────────────────┐       ┌──────────────────┐
+│  chat-backend/      │◄──────┤ Secret Manager   │
+│  (Next.js API)      │       │ (GEMINI_API_KEY) │
+│  Port: 8081         │       └──────────────────┘
+└──────────┬──────────┘
+           │
+           ▼
+    ┌────────────┐
+    │ Gemini API │
+    │ + Google   │
+    │   Search   │
+    └────────────┘
+```
+
+### 主な機能
+
+- **AI チャット**: Gemini 2.5 Flash モデルを使用
+- **Google Search Grounding**: 最新情報を検索して回答に反映
+- **引用元表示**: 情報源のURLを表示
+- **フロントエンド・バックエンド分離**: 独立したスケーリングとデプロイが可能
+
+### ローカル開発環境（docker-compose）
+
+#### 前提条件
+
+- Docker と Docker Compose がインストールされていること
+- Gemini API キーを取得していること（[Google AI Studio](https://makersuite.google.com/app/apikey)）
+
+#### 起動方法
+
+1. **環境変数の設定**
+
+```bash
+# プロジェクトルートで
+export GEMINI_API_KEY=your_api_key_here
+```
+
+2. **docker-compose で起動**
+
+```bash
+docker-compose up --build
+```
+
+3. **ブラウザでアクセス**
+
+```
+http://localhost:3000
+```
+
+- フロントエンド: `http://localhost:3000`
+- バックエンドAPI: `http://localhost:8081`
+
+#### 停止方法
+
+```bash
+docker-compose down
+```
+
+### Cloud Run へのデプロイ（Terraform）
+
+#### 前提条件
+
+- Google Cloud SDK (`gcloud`) がインストールされていること
+- Terraform (>= 1.0) がインストールされていること
+- Google Cloud プロジェクトが作成されていること
+
+#### デプロイ手順
+
+詳細は `terraform/README.md` を参照してください。
+
+**簡易手順:**
+
+1. **必要なAPIの有効化**
+
+```bash
+gcloud services enable run.googleapis.com \
+  cloudbuild.googleapis.com \
+  artifactregistry.googleapis.com \
+  secretmanager.googleapis.com
+```
+
+2. **イメージのビルドとプッシュ**
+
+```bash
+# バックエンド
+cd chat-backend
+gcloud builds submit \
+  --tag asia-northeast1-docker.pkg.dev/[PROJECT_ID]/chat-app/backend:latest
+
+# フロントエンド（バックエンドデプロイ後）
+cd ../chat-frontend
+BACKEND_URL=$(cd ../terraform && terraform output -raw backend_url)
+gcloud builds submit \
+  --substitutions _NEXT_PUBLIC_API_URL=$BACKEND_URL \
+  --config cloudbuild.yaml
+```
+
+3. **Terraformでデプロイ**
+
+```bash
+cd ../terraform
+cp terraform.tfvars.example terraform.tfvars
+# terraform.tfvars を編集（project_id, gemini_api_key を設定）
+
+terraform init
+terraform plan
+terraform apply
+```
+
+4. **URLの確認**
+
+```bash
+terraform output frontend_url
+terraform output backend_url
+```
+
+#### クリーンアップ
+
+```bash
+cd terraform
+terraform destroy
+```
+
+### ディレクトリ構成
+
+```
+aichat-pbcc/
+├── chat-frontend/          # フロントエンド（Next.js SSR）
+│   ├── app/               # Next.js App Router
+│   ├── lib/               # API クライアント
+│   ├── Dockerfile
+│   └── package.json
+│
+├── chat-backend/          # バックエンド（Next.js API Routes）
+│   ├── app/api/          # API エンドポイント
+│   │   ├── chat/        # チャットAPI
+│   │   └── health/      # ヘルスチェック
+│   ├── middleware.ts     # CORS設定
+│   ├── Dockerfile
+│   └── package.json
+│
+├── terraform/             # Cloud Run デプロイ用
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── README.md
+│
+└── docker-compose.yml     # ローカル開発環境
+```
+
+### トラブルシューティング
+
+#### CORSエラーが発生する
+
+バックエンドの `ALLOWED_ORIGINS` 環境変数が正しく設定されているか確認してください：
+
+```bash
+# docker-compose の場合
+# docker-compose.yml の backend.environment.ALLOWED_ORIGINS を確認
+
+# Cloud Run の場合
+# terraform/main.tf の ALLOWED_ORIGINS を確認
+```
+
+#### Gemini API エラー
+
+API キーが正しく設定されているか確認してください：
+
+```bash
+# ローカル
+echo $GEMINI_API_KEY
+
+# Cloud Run
+# Secret Manager に GEMINI_API_KEY が登録されているか確認
+gcloud secrets versions access latest --secret="GEMINI_API_KEY"
+```
+
 ---
 
 ## 🙏 謝辞
