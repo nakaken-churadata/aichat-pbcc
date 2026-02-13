@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -22,19 +22,21 @@ export async function POST(request: NextRequest) {
     }
 
     // GEMINI API クライアントを初期化
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      tools: [{ googleSearch: {} }],
-    });
+    const ai = new GoogleGenAI({ apiKey });
 
     // メッセージを送信（Google Search grounding を使用）
-    const result = await model.generateContent(message);
-    const response = result.response;
-    const text = response.text();
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: message,
+      config: {
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
+    const text = result.text;
 
     // グラウンディングメタデータ（検索結果のURL等）を取得
-    const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+    const groundingMetadata = result.candidates?.[0]?.groundingMetadata;
     const searchEntryPoint = groundingMetadata?.searchEntryPoint;
     const groundingChunks = groundingMetadata?.groundingChunks;
 
