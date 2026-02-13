@@ -18,11 +18,11 @@ get_tmux_indices() {
 # エージェント→tmuxターゲット マッピング
 get_agent_target() {
     case "$1" in
-        "おじいさん") echo "おじいさん" ;;
+        "おじいさん") echo "main" ;;
         "桃太郎"|"お供の犬"|"お供の猿"|"お供の雉")
-            # 仲間セッションのindexを動的に取得
-            if tmux has-session -t 仲間 2>/dev/null; then
-                local indices=($(get_tmux_indices 仲間))
+            # agentsセッションのindexを動的に取得
+            if tmux has-session -t agents 2>/dev/null; then
+                local indices=($(get_tmux_indices agents))
                 local window_index=${indices[0]}
                 local pane_index=${indices[1]}
 
@@ -31,10 +31,10 @@ get_agent_target() {
 
                 # pane番号を計算
                 case "$1" in
-                    "桃太郎") echo "仲間:$window_name.$((pane_index))" ;;
-                    "お供の犬") echo "仲間:$window_name.$((pane_index + 2))" ;;
-                    "お供の猿") echo "仲間:$window_name.$((pane_index + 1))" ;;
-                    "お供の雉") echo "仲間:$window_name.$((pane_index + 3))" ;;
+                    "桃太郎") echo "agents:$window_name.$((pane_index))" ;;
+                    "お供の犬") echo "agents:$window_name.$((pane_index + 2))" ;;
+                    "お供の猿") echo "agents:$window_name.$((pane_index + 1))" ;;
+                    "お供の雉") echo "agents:$window_name.$((pane_index + 3))" ;;
                 esac
             else
                 echo ""
@@ -72,14 +72,14 @@ show_agents() {
     echo "=========================="
 
     # おじいさんセッション確認
-    if tmux has-session -t おじいさん 2>/dev/null; then
-        echo "  おじいさん → おじいさん       (プロジェクト統括責任者)"
+    if tmux has-session -t main 2>/dev/null; then
+        echo "  おじいさん → main       (プロジェクト統括責任者)"
     else
         echo "  おじいさん → [未起動]        (プロジェクト統括責任者)"
     fi
 
-    # 仲間セッション確認
-    if tmux has-session -t 仲間 2>/dev/null; then
+    # agentsセッション確認
+    if tmux has-session -t agents 2>/dev/null; then
         local momotaro_target=$(get_agent_target "桃太郎")
         local inu_target=$(get_agent_target "お供の犬")
         local saru_target=$(get_agent_target "お供の猿")
