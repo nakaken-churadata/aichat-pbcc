@@ -472,53 +472,20 @@ docker-compose down
 
 #### デプロイ手順
 
-詳細は `terraform/README.md` を参照してください。
+**詳細な手順は `terraform/README.md` を参照してください。**
 
-**簡易手順:**
+`terraform/README.md` には以下の詳細が記載されています：
+- API の有効化方法
+- イメージのビルドとプッシュの詳細手順
+- Terraform の設定方法
+- トラブルシューティング
 
-1. **必要なAPIの有効化**
+**概要:**
 
-```bash
-gcloud services enable run.googleapis.com \
-  cloudbuild.googleapis.com \
-  artifactregistry.googleapis.com \
-  secretmanager.googleapis.com
-```
-
-2. **イメージのビルドとプッシュ**
-
-```bash
-# バックエンド
-cd chat-backend
-gcloud builds submit \
-  --tag asia-northeast1-docker.pkg.dev/[PROJECT_ID]/chat-app/backend:latest
-
-# フロントエンド（バックエンドデプロイ後）
-cd ../chat-frontend
-BACKEND_URL=$(cd ../terraform && terraform output -raw backend_url)
-gcloud builds submit \
-  --substitutions _NEXT_PUBLIC_API_URL=$BACKEND_URL \
-  --config cloudbuild.yaml
-```
-
-3. **Terraformでデプロイ**
-
-```bash
-cd ../terraform
-cp terraform.tfvars.example terraform.tfvars
-# terraform.tfvars を編集（project_id, gemini_api_key を設定）
-
-terraform init
-terraform plan
-terraform apply
-```
-
-4. **URLの確認**
-
-```bash
-terraform output frontend_url
-terraform output backend_url
-```
+1. 必要な API を有効化
+2. バックエンドとフロントエンドのイメージをビルド＆プッシュ
+3. `terraform.tfvars` を作成・編集
+4. `terraform init && terraform plan && terraform apply` を実行
 
 #### クリーンアップ
 
