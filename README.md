@@ -11,6 +11,11 @@
 > **📌 このプロジェクトについて**
 > このシステムは [nishimoto265/Claude-Code-Communication](https://github.com/nishimoto265/Claude-Code-Communication) を元に作成・拡張されています。
 
+## 📖 このプロジェクトを使いたい方へ
+
+機能追加や不具合対応を行いたい方は、**[CONTRIBUTING.md](CONTRIBUTING.md)** をご覧ください。
+おじいさんへの適切な指示方法や、禁止事項・注意事項を記載しています。
+
 ### 👥 エージェント構成と役割
 
 ```
