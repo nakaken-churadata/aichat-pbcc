@@ -2,46 +2,30 @@
 
 # 🚀 Agent間メッセージ送信スクリプト
 
-# tmuxのbase-indexとpane-base-indexを動的に取得
-get_tmux_indices() {
-    local session="$1"
-    local window_index=$(tmux show-options -t "$session" -g base-index 2>/dev/null | awk '{print $2}')
-    local pane_index=$(tmux show-options -t "$session" -g pane-base-index 2>/dev/null | awk '{print $2}')
-
-    # デフォルト値
-    window_index=${window_index:-0}
-    pane_index=${pane_index:-0}
-
-    echo "$window_index $pane_index"
-}
-
-# エージェント→tmuxターゲット マッピング
+# エージェント→tmuxターゲット マッピング（ユーザーオプションベース）
 get_agent_target() {
-    case "$1" in
-        "おじいさん") echo "main" ;;
-        "桃太郎"|"お供の犬"|"お供の猿"|"お供の雉")
-            # agentsセッションのindexを動的に取得
-            if tmux has-session -t agents 2>/dev/null; then
-                local indices=($(get_tmux_indices agents))
-                local window_index=${indices[0]}
-                local pane_index=${indices[1]}
+    local agent_name="$1"
 
-                # window名で取得（base-indexに依存しない）
-                local window_name="agents"
+    # 全てのペインからユーザーオプション @agent_role を取得
+    local pane_info
+    pane_info=$(tmux list-panes -a -F "#{pane_id} #{@agent_role}" 2>/dev/null)
 
-                # pane番号を計算
-                case "$1" in
-                    "桃太郎") echo "agents:$window_name.$((pane_index))" ;;
-                    "お供の犬") echo "agents:$window_name.$((pane_index + 2))" ;;
-                    "お供の猿") echo "agents:$window_name.$((pane_index + 1))" ;;
-                    "お供の雉") echo "agents:$window_name.$((pane_index + 3))" ;;
-                esac
-            else
-                echo ""
-            fi
-            ;;
-        *) echo "" ;;
-    esac
+    if [[ -z "$pane_info" ]]; then
+        echo ""
+        return 1
+    fi
+
+    # 該当する役割名を持つ pane_id を検索
+    local target_pane_id
+    target_pane_id=$(echo "$pane_info" | grep -F "$agent_name" | awk '{print $1}')
+
+    if [[ -z "$target_pane_id" ]]; then
+        echo ""
+        return 1
+    fi
+
+    # pane_id をそのまま返す（例: %1, %2, etc.）
+    echo "$target_pane_id"
 }
 
 show_usage() {
@@ -71,30 +55,20 @@ show_agents() {
     echo "📋 利用可能なエージェント:"
     echo "=========================="
 
-    # おじいさんセッション確認
-    if tmux has-session -t main 2>/dev/null; then
-        echo "  おじいさん → main       (プロジェクト統括責任者)"
-    else
-        echo "  おじいさん → [未起動]        (プロジェクト統括責任者)"
-    fi
+    # 各エージェントの状態を確認
+    local agents=("おじいさん:プロジェクト統括責任者" "桃太郎:チームリーダー" "お供の犬:実行担当者A" "お供の猿:実行担当者B" "お供の雉:実行担当者C")
 
-    # agentsセッション確認
-    if tmux has-session -t agents 2>/dev/null; then
-        local momotaro_target=$(get_agent_target "桃太郎")
-        local inu_target=$(get_agent_target "お供の犬")
-        local saru_target=$(get_agent_target "お供の猿")
-        local kiji_target=$(get_agent_target "お供の雉")
+    for agent_info in "${agents[@]}"; do
+        local agent_name="${agent_info%%:*}"
+        local agent_desc="${agent_info#*:}"
+        local target=$(get_agent_target "$agent_name")
 
-        echo "  桃太郎     → ${momotaro_target:-[エラー]}  (チームリーダー)"
-        echo "  お供の犬   → ${inu_target:-[エラー]}  (実行担当者A)"
-        echo "  お供の猿   → ${saru_target:-[エラー]}  (実行担当者B)"
-        echo "  お供の雉   → ${kiji_target:-[エラー]}  (実行担当者C)"
-    else
-        echo "  桃太郎     → [未起動]        (チームリーダー)"
-        echo "  お供の犬   → [未起動]        (実行担当者A)"
-        echo "  お供の猿   → [未起動]        (実行担当者B)"
-        echo "  お供の雉   → [未起動]        (実行担当者C)"
-    fi
+        if [[ -n "$target" ]]; then
+            echo "  $agent_name → $target  ($agent_desc)"
+        else
+            echo "  $agent_name → [未起動]  ($agent_desc)"
+        fi
+    done
 }
 
 # ログ記録
@@ -130,10 +104,10 @@ send_message() {
 # ターゲット存在確認
 check_target() {
     local target="$1"
-    local session_name="${target%%:*}"
 
-    if ! tmux has-session -t "$session_name" 2>/dev/null; then
-        echo "❌ セッション '$session_name' が見つかりません"
+    # pane_id が有効かどうかを確認
+    if ! tmux display-message -p -t "$target" "#{pane_id}" 2>/dev/null >/dev/null; then
+        echo "❌ ペイン '$target' が見つかりません"
         return 1
     fi
 
