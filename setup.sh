@@ -124,6 +124,9 @@ for i in {0..3}; do
     # エージェント役割を環境変数として設定
     tmux send-keys -t "$PANE_ID" "export AGENT_ROLE='${TITLE}'" C-m
 
+    # tmux ユーザーオプションとして役割を設定
+    tmux set-option -p -t "$PANE_ID" @agent_role "${TITLE}"
+
     # カラープロンプト設定
     if [ $i -eq 0 ]; then
         # 桃太郎: 赤色
@@ -147,6 +150,11 @@ log_info "👑 mainセッション作成開始..."
 tmux new-session -d -s main
 tmux send-keys -t main "cd $(pwd)" C-m
 tmux send-keys -t main "export AGENT_ROLE='おじいさん'" C-m
+
+# tmux ユーザーオプションとして役割を設定
+MAIN_PANE_ID=$(tmux list-panes -t main -F "#{pane_id}")
+tmux set-option -p -t "$MAIN_PANE_ID" @agent_role "おじいさん"
+
 set_color_prompt "main" "おじいさん" "35"
 tmux send-keys -t main "echo '=== おじいさん セッション ==='" C-m
 tmux send-keys -t main "echo '役割: おじいさん'" C-m
