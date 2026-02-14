@@ -27,7 +27,7 @@ APIキーやシークレットなどのセンシティブ情報を適切に管�
 `.env.example`:
 ```bash
 # Google Gemini API Key
-GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
 
 # Allowed Origins (comma-separated)
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
@@ -66,7 +66,7 @@ chmod +x .git/hooks/pre-commit
 - AWS Access Key ID: `AKIA[0-9A-Z]{16}`
 - GitHub Personal Access Token: `ghp_[A-Za-z0-9]{36}`
 - OpenAI API Key: `sk-[A-Za-z0-9]{48}`
-- Private Key: `-----BEGIN.*PRIVATE KEY-----`
+- Private Key: `-----BEGIN [TYPE] PRIVATE KEY-----` (正規表現パターン)
 - その他の API Key、パスワード、シークレット
 
 **フックをバイパスする場合（緊急時のみ）:**
