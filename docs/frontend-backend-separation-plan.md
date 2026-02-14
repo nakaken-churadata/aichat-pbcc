@@ -166,7 +166,7 @@ ALLOWED_ORIGINS=http://localhost:3000
 
 `chat-backend/.env.local`:
 ```
-GEMINI_API_KEY=AIzaSyCrIltaWWJZNwS0djqhdIn5xNRW-_ZeZbg
+GEMINI_API_KEY=your_gemini_api_key_here
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
 ```
 
@@ -586,7 +586,7 @@ rm -rf chat-app-legacy
 
 10. **`chat-backend/.env.local`**
     ```
-    GEMINI_API_KEY=AIzaSyCrIltaWWJZNwS0djqhdIn5xNRW-_ZeZbg
+    GEMINI_API_KEY=your_gemini_api_key_here
     ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
     ```
 
@@ -712,7 +712,7 @@ docker system prune -f
 
 ## Notes
 
-- GEMINI_API_KEY は `.env.local` に既に設定済み（`AIzaSyCrIltaWWJZNwS0djqhdIn5xNRW-_ZeZbg`）
+- GEMINI_API_KEY は `.env.local` に設定が必要（実際の API Key を設定してください）
 - Google Cloud Project ID は実際の値に置き換える必要あり
 - 既存の `chat-app/` は `chat-app-legacy/` として保持し、動作確認後に削除
 - フロントエンドはSSRを保持するため、完全な静的エクスポートではない
