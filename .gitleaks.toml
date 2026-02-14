@@ -83,11 +83,15 @@ paths = [
 
 # Allowlist specific patterns that are placeholders
 regexes = [
-    '''your_.*_key_here''',
-    '''your_.*_secret_here''',
+    '''(?i)your_.*_key_here''',
+    '''(?i)your_.*_secret_here''',
     '''REPLACE_WITH_.*''',
     '''<YOUR_.*>''',
-    '''example.*key''',
-    '''test.*key''',
-    '''dummy.*key''',
+    '''(?i)example.*key''',
+    '''(?i)test.*key''',
+    '''(?i)dummy.*key''',
+    '''BEGIN.*PRIVATE KEY.*''',
+    '''.*検出.*パターン.*''',
+    '''YOUR_.*_KEY_.*''',
+    '''YOUR_.*_SECRET_.*''',
 ]
