@@ -94,4 +94,9 @@ regexes = [
     '''.*検出.*パターン.*''',
     '''YOUR_.*_KEY_.*''',
     '''YOUR_.*_SECRET_.*''',
+    # 完全一致パターン（誤検知対策）
+    '''YOUR_GEMINI_API_KEY_HERE''',
+    '''YOUR_[A-Z_]+_KEY_HERE''',
+    '''.*YOUR.*API.*KEY.*HERE.*''',
+    '''[A-Z_]*YOUR_[A-Z_]*API[A-Z_]*KEY[A-Z_]*HERE[A-Z_]*''',
 ]
