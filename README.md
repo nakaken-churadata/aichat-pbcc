@@ -92,20 +92,6 @@ tmux send-keys -t おじいさん 'claude' C-m
 for i in {0..3}; do tmux send-keys -t 仲間:0.$i 'claude' C-m; done
 ```
 
-各エージェントに役割を伝えます（自動）：
-```bash
-# 全エージェントに役割を自動通知
-./init-agents.sh
-```
-
-または、手動で個別に通知する場合：
-```bash
-./agent-send.sh 桃太郎 "あなたは「桃太郎」です。環境変数 AGENT_ROLE を確認し、instructions/momotarou.md の指示に従ってください。"
-./agent-send.sh お供の犬 "あなたは「お供の犬」です。環境変数 AGENT_ROLE を確認し、instructions/otomo.md の指示に従ってください。語尾は「ワン」です。"
-./agent-send.sh お供の猿 "あなたは「お供の猿」です。環境変数 AGENT_ROLE を確認し、instructions/otomo.md の指示に従ってください。語尾は「ウキー」です。"
-./agent-send.sh お供の雉 "あなたは「お供の雉」です。環境変数 AGENT_ROLE を確認し、instructions/otomo.md の指示に従ってください。語尾は「ケーン」です。"
-```
-
 ### 4. 実際の開発作業例
 
 おじいさんセッションで作業を依頼：
