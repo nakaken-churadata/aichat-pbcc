@@ -1,0 +1,93 @@
+# Gitleaks configuration for detecting sensitive information
+
+title = "gitleaks config"
+
+# Google API Key
+[[rules]]
+id = "google-api-key"
+description = "Google API Key"
+regex = '''AIzaSy[A-Za-z0-9_-]{33}'''
+tags = ["key", "Google"]
+
+# AWS Access Key ID
+[[rules]]
+id = "aws-access-key-id"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["key", "AWS"]
+
+# AWS Secret Access Key
+[[rules]]
+id = "aws-secret-access-key"
+description = "AWS Secret Access Key"
+regex = '''(?i)aws(.{0,20})?['\"][0-9a-zA-Z/+]{40}['\"]'''
+tags = ["key", "AWS"]
+
+# GitHub Personal Access Token
+[[rules]]
+id = "github-pat"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[A-Za-z0-9]{36}'''
+tags = ["key", "GitHub"]
+
+# GitHub OAuth Access Token
+[[rules]]
+id = "github-oauth"
+description = "GitHub OAuth Access Token"
+regex = '''gho_[A-Za-z0-9]{36}'''
+tags = ["key", "GitHub"]
+
+# OpenAI API Key
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API Key"
+regex = '''sk-[A-Za-z0-9]{48}'''
+tags = ["key", "OpenAI"]
+
+# Generic API Key
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api_key|apikey|api-key)['"]?\s*[:=]\s*['"]?[A-Za-z0-9_-]{20,}['"]?'''
+tags = ["key", "generic"]
+
+# Private Key
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN.*PRIVATE KEY-----'''
+tags = ["key", "private"]
+
+# Generic Secret
+[[rules]]
+id = "generic-secret"
+description = "Generic Secret"
+regex = '''(?i)(secret|password)['"]?\s*[:=]\s*['"][^'"]{8,}['"]'''
+tags = ["secret", "generic"]
+
+# Allowlist for false positives
+[allowlist]
+description = "Allowlisted files and patterns"
+files = [
+    '''\.env\.example$''',
+    '''\.env\.template$''',
+    '''docs/security-guidelines\.md$''',
+    '''CONTRIBUTING\.md$''',
+    '''README\.md$''',
+]
+
+paths = [
+    '''hooks/pre-commit''',
+    '''.gitleaks.toml''',
+]
+
+# Allowlist specific patterns that are placeholders
+regexes = [
+    '''your_.*_key_here''',
+    '''your_.*_secret_here''',
+    '''REPLACE_WITH_.*''',
+    '''<YOUR_.*>''',
+    '''example.*key''',
+    '''test.*key''',
+    '''dummy.*key''',
+]

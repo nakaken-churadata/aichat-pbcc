@@ -185,7 +185,23 @@ echo "  mainセッション（1ペイン）:"
 echo "    Pane: おじいさん (プロジェクト統括)"
 
 echo ""
+echo "🔒 セキュリティ設定..."
+# Pre-commit hook のインストール
+if [ -f "hooks/pre-commit" ]; then
+    cp hooks/pre-commit .git/hooks/pre-commit
+    chmod +x .git/hooks/pre-commit
+    log_success "✅ Pre-commit hook をインストールしました"
+else
+    log_warning "⚠️  hooks/pre-commit が見つかりません"
+fi
+
+echo ""
 log_success "🎉 Demo環境セットアップ完了！"
+echo ""
+echo "🔒 セキュリティ機能:"
+echo "  - Pre-commit hook: センシティブ情報を自動検出"
+echo "  - Gitleaks: リポジトリ全体をスキャン"
+echo "  - 詳細: docs/security-guidelines.md"
 echo ""
 echo "📋 次のステップ:"
 echo "  1. 🔗 セッションアタッチ:"
