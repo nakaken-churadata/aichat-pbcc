@@ -19,10 +19,33 @@ Thumbs.db
 .vscode/
 .idea/
 
-# 環境変数
+# 環境変数とセンシティブ情報
 .env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+credentials/
+*.credentials
+*.secret
+
+# API Keys とトークン
+*apikey*
+*api_key*
+*api-key*
+*token*
+*secret*
+!**/.gitkeep
 
 # Next.js
 node_modules/
 .next/
-.env*.local
+out/
+build/
+dist/
