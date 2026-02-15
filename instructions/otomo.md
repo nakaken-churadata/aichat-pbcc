@@ -42,6 +42,28 @@
 #### 2. ブランチ・worktree を作成する
 issue を元にブランチと worktree を作成し、worktree 内で作業を行う。
 
+**worktree のディレクトリ作成場所（重要）:**
+- **必ず**プロジェクトルート直下の `worktrees/` ディレクトリ配下に作成すること
+- ディレクトリ構造：
+  ```
+  /Users/kenji.nakagaki/git/aichat-pbcc/
+  ├── worktrees/
+  │   ├── feature-issue-XX/
+  │   └── feature-issue-YY/
+  ```
+
+**作成コマンド例：**
+```bash
+# メインリポジトリで実行
+cd /Users/kenji.nakagaki/git/aichat-pbcc
+git worktree add worktrees/feature-issue-XX -b feature/issue-XX-description
+```
+
+**注意事項：**
+- worktree 名は `feature-issue-XX` の形式を推奨（XX は issue 番号）
+- ブランチ名は `feature/issue-XX-description` の形式を推奨
+- 作業は必ず worktree 内で行うこと
+
 #### 3. 作業を実行する
 worktree 内で指示された作業を行い、コミットする。
 
@@ -65,6 +87,11 @@ worktree 内で指示された作業を行い、コミットする。
 
 1. プルリクエストをno-ffマージ
 2. worktree を削除
+   ```bash
+   # メインリポジトリから実行
+   cd /Users/kenji.nakagaki/git/aichat-pbcc
+   git worktree remove worktrees/feature-issue-XX
+   ```
 3. ブランチを削除
 4. **メインリポジトリを最新化**（重要）
    ```bash
