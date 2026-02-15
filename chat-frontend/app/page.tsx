@@ -43,12 +43,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      {/* ヘッダー */}
-      <header className="border-b bg-white px-4 py-4 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">GEMINI チャット</h1>
-      </header>
-
+    <div className="flex flex-1 flex-col bg-gray-50">
       {/* メッセージエリア */}
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto max-w-3xl space-y-4">
