@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y \
     jq \
     python3 \
     python3-pip \
+    iptables \
+    ipset \
+    aggregate \
+    dnsutils \
     && rm -rf /var/lib/apt/lists/*
 
 # ロケール設定と日本語フォントのインストール
@@ -45,14 +49,12 @@ RUN ARCH=$(dpkg --print-architecture) && \
     mv gitleaks /usr/local/bin/ && \
     rm gitleaks_8.18.1_linux_${GITLEAKS_ARCH}.tar.gz
 
-# Claude Code CLI のインストール
-RUN curl -fsSL https://claude.ai/install.sh -o /tmp/install-claude.sh \
-    && chmod +x /tmp/install-claude.sh \
-    && bash /tmp/install-claude.sh || echo "⚠️  Claude CLI のインストールをスキップ" \
-    && rm -f /tmp/install-claude.sh
+# Claude Code CLI のインストール（npmパッケージを使用）
+ARG CLAUDE_CODE_VERSION=latest
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
 
-# PATH に追加（nodeユーザーのパスを使用）
-ENV PATH="/home/node/.local/bin:${PATH}"
+# PATH に追加（npmグローバルパッケージのパス）
+ENV PATH="/home/node/.local/bin:/usr/local/share/npm-global/bin:${PATH}"
 
 # 作業ディレクトリの設定
 WORKDIR /workspace
