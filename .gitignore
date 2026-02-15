@@ -8,6 +8,15 @@ tmp/
 *.tmp
 *_done.txt
 
+# キャッシュ
+.cache/
+
+# Git worktree
+worktrees/
+
+# Claude Code
+.claude/
+
 # OS固有
 .DS_Store
 Thumbs.db
