@@ -51,8 +51,8 @@ RUN curl -fsSL https://claude.ai/install.sh -o /tmp/install-claude.sh \
     && bash /tmp/install-claude.sh || echo "⚠️  Claude CLI のインストールをスキップ" \
     && rm -f /tmp/install-claude.sh
 
-# PATH に追加
-ENV PATH="/home/vscode/.local/bin:${PATH}"
+# PATH に追加（nodeユーザーのパスを使用）
+ENV PATH="/home/node/.local/bin:${PATH}"
 
 # 作業ディレクトリの設定
 WORKDIR /workspace
@@ -63,5 +63,5 @@ RUN touch /.devcontainer_marker
 # デフォルトシェルを bash に設定
 ENV SHELL=/bin/bash
 
-# vscode ユーザーに切り替え
-USER vscode
+# node ユーザーに切り替え（ベースイメージのデフォルトユーザー）
+USER node

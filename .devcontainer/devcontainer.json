@@ -28,9 +28,9 @@
   },
   "forwardPorts": [3000, 8080, 8081],
   "postCreateCommand": "npm install -g pnpm && echo 'Dev container ready!'",
-  "remoteUser": "vscode",
+  "remoteUser": "node",
   "mounts": [
-    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.claude,target=/home/node/.claude,type=bind,consistency=cached"
   ],
   "remoteEnv": {
     "AGENT_ROLE": "${localEnv:AGENT_ROLE}"
