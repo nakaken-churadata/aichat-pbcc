@@ -141,7 +141,7 @@ main() {
     local current_pane_id
     current_pane_id=$(tmux display-message -p "#{pane_id}")
     local sender
-    sender=$(tmux show-option -p -t "$current_pane_id" "@agent_role")
+    sender=$(tmux show-option -pv -t "$current_pane_id" "@agent_role")
 
     # 送信元が不明な場合のフォールバック
     if [[ -z "$sender" ]]; then
