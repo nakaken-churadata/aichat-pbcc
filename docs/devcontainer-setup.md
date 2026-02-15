@@ -33,6 +33,39 @@ devcontainer を使用することで：
 - 8GB 以上の RAM
 - 十分なディスク容量（Docker イメージとコンテナ用）
 
+## Appleシリコン対応
+
+このプロジェクトの devcontainer は、**Intel Mac と Appleシリコン Mac の両方でネイティブ動作**するよう設計されています。
+
+### マルチアーキテクチャサポート
+
+- **Intel Mac (x86_64)**: ネイティブで動作
+- **Appleシリコン Mac (ARM64)**: ネイティブで動作（エミュレーションなし）
+
+### 動作確認方法
+
+コンテナ内で以下のコマンドを実行して、アーキテクチャを確認できます：
+
+```bash
+# アーキテクチャの確認
+uname -m
+# Intel Mac: x86_64
+# Appleシリコン Mac: aarch64 (または arm64)
+
+# gitleaks のアーキテクチャ確認
+file /usr/local/bin/gitleaks
+# Intel Mac: ELF 64-bit LSB executable, x86-64
+# Appleシリコン Mac: ELF 64-bit LSB executable, ARM aarch64
+```
+
+### 技術的な詳細
+
+Dockerfile では、`dpkg --print-architecture` を使用してコンテナのアーキテクチャを自動検出し、適切なバイナリをダウンロードします。これにより：
+
+- パフォーマンスが最適化されます（ネイティブ実行）
+- エミュレーションによる速度低下を回避できます
+- 両方のアーキテクチャで同じ Dockerfile を使用できます
+
 ## セットアップ手順
 
 ### 1. Dev Containers 拡張機能のインストール
@@ -204,6 +237,38 @@ claude --version
 1. ファイルを保存したことを確認
 2. VSCode でファイルを再読み込み
 3. コンテナを再起動
+
+### Appleシリコン Mac で動作が遅い
+
+**原因**: エミュレーションモードで動作している可能性がある
+
+**確認方法**:
+コンテナ内で以下を実行：
+```bash
+uname -m
+```
+`x86_64` と表示される場合はエミュレーションモード、`aarch64` または `arm64` と表示される場合はネイティブモードです。
+
+**解決策**:
+1. devcontainer.json に `"platform": "linux/amd64"` のような指定がないことを確認
+2. コンテナを再ビルド: `Dev Containers: Rebuild Container`
+3. Docker Desktop の設定で「Use Rosetta for x86/amd64 emulation」が無効になっていることを確認
+
+### Appleシリコン Mac で gitleaks が動作しない
+
+**原因**: 古いバージョンの Dockerfile が使用されている可能性がある
+
+**解決策**:
+1. 最新の Dockerfile を取得：
+   ```bash
+   git pull origin main
+   ```
+2. コンテナを再ビルド: `Dev Containers: Rebuild Container`
+3. コンテナ内で gitleaks が正しいアーキテクチャか確認：
+   ```bash
+   file /usr/local/bin/gitleaks
+   # ARM aarch64 と表示されるべき
+   ```
 
 ## カスタマイズ
 

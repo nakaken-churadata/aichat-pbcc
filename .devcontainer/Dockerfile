@@ -16,11 +16,19 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# gitleaks のインストール
-RUN wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz \
-    && tar -xzf gitleaks_8.18.1_linux_x64.tar.gz \
-    && mv gitleaks /usr/local/bin/ \
-    && rm gitleaks_8.18.1_linux_x64.tar.gz
+# gitleaks のインストール（マルチアーキテクチャ対応）
+RUN ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" = "amd64" ]; then \
+        GITLEAKS_ARCH="x64"; \
+    elif [ "$ARCH" = "arm64" ]; then \
+        GITLEAKS_ARCH="arm64"; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi && \
+    wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_${GITLEAKS_ARCH}.tar.gz && \
+    tar -xzf gitleaks_8.18.1_linux_${GITLEAKS_ARCH}.tar.gz && \
+    mv gitleaks /usr/local/bin/ && \
+    rm gitleaks_8.18.1_linux_${GITLEAKS_ARCH}.tar.gz
 
 # Claude Code CLI のインストール（オプショナル）
 # 注: インストールスクリプトが存在しない場合はスキップされます
