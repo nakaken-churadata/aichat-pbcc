@@ -2,7 +2,8 @@
 # agent-init.sh - エージェント環境変数初期化スクリプト
 
 if [ -n "$TMUX" ]; then
-    PANE_ID=$(tmux display-message -p '#{pane_id}')
+    # TMUX_PANE 環境変数を使用（tmuxが各ペインに自動設定）
+    PANE_ID="$TMUX_PANE"
     echo "🔍 デバッグ: 現在のペインID = $PANE_ID"
 
     AGENT_ROLE_FROM_TMUX=$(tmux show-option -pv -t "$PANE_ID" @agent_role 2>/dev/null)
