@@ -139,9 +139,9 @@ main() {
 
     # 現在のペインのエージェント名を取得
     local current_pane_id
-    current_pane_id=$(tmux display-message -p "#{pane_id}")
+    current_pane_id=$(tmux display-message -p "#{pane_id}" 2>/dev/null)
     local sender
-    sender=$(tmux show-option -pv -t "$current_pane_id" "@agent_role")
+    sender=$(tmux display-message -p "#{@agent_role}" 2>/dev/null)
 
     # 送信元が不明な場合のフォールバック
     if [[ -z "$sender" ]]; then

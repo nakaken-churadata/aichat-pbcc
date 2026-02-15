@@ -3,7 +3,10 @@
 
 if [ -n "$TMUX" ]; then
     PANE_ID=$(tmux display-message -p '#{pane_id}')
+    echo "🔍 デバッグ: 現在のペインID = $PANE_ID"
+
     AGENT_ROLE_FROM_TMUX=$(tmux show-option -pv -t "$PANE_ID" @agent_role 2>/dev/null)
+    echo "🔍 デバッグ: @agent_role = $AGENT_ROLE_FROM_TMUX"
 
     if [ -n "$AGENT_ROLE_FROM_TMUX" ]; then
         export AGENT_ROLE="$AGENT_ROLE_FROM_TMUX"
