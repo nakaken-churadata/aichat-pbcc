@@ -1,0 +1,22 @@
+# 依存関係
+node_modules/
+
+# Git 関連
+.git/
+
+# Worktree
+worktrees/
+
+# ログファイル
+*.log
+
+# システムファイル
+.DS_Store
+
+# キャッシュ
+.cache/
+*.tmp
+
+# ビルド成果物（将来的に追加される可能性）
+dist/
+build/
