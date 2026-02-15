@@ -46,7 +46,7 @@ RUN ARCH=$(dpkg --print-architecture) && \
     rm gitleaks_8.18.1_linux_${GITLEAKS_ARCH}.tar.gz
 
 # Claude Code CLI のインストール
-RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh -o /tmp/install-claude.sh \
+RUN curl -fsSL https://claude.ai/install.sh -o /tmp/install-claude.sh \
     && chmod +x /tmp/install-claude.sh \
     && bash /tmp/install-claude.sh || echo "⚠️  Claude CLI のインストールをスキップ" \
     && rm -f /tmp/install-claude.sh
