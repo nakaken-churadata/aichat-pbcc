@@ -141,7 +141,13 @@ main() {
     local current_pane_id
     current_pane_id=$(tmux display-message -p "#{pane_id}" 2>/dev/null)
     local sender
-    sender=$(tmux display-message -p "#{@agent_role}" 2>/dev/null)
+
+    # 環境変数を優先、なければtmuxオプションを使用
+    if [[ -n "$AGENT_ROLE" ]]; then
+        sender="$AGENT_ROLE"
+    else
+        sender=$(tmux display-message -p "#{@agent_role}" 2>/dev/null)
+    fi
 
     # 送信元が不明な場合のフォールバック
     if [[ -z "$sender" ]]; then
