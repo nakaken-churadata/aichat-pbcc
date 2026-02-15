@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "@google/genai": "^1.41.0",
+    "google-auth-library": "^10.5.0",
+    "jsonwebtoken": "^9.0.3",
     "next": "16.1.6"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "19.2.14",
     "eslint": "^9",
