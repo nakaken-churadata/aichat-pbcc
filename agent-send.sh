@@ -180,4 +180,27 @@ main() {
     return 0
 }
 
+# ロックディレクトリを使って排他制御（macOS互換）
+LOCK_DIR="/tmp/agent-send.lock"
+
+# クリーンアップ関数
+cleanup() {
+    rmdir "$LOCK_DIR" 2>/dev/null
+}
+trap cleanup EXIT
+
+# ロックを取得（最大10秒待機、100ms間隔で100回試行）
+for i in {1..100}; do
+    if mkdir "$LOCK_DIR" 2>/dev/null; then
+        # ロック取得成功
+        break
+    fi
+    if [ $i -eq 100 ]; then
+        echo "❌ エラー: 他の agent-send.sh が実行中です。しばらく待ってから再試行してください"
+        exit 1
+    fi
+    sleep 0.1
+done
+
+# メイン処理を実行（ロックは EXIT 時に自動解放）
 main "$@"
