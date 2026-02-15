@@ -111,10 +111,15 @@ fi
 
 # ペインの物理的な配置を取得（top-leftから順番に）
 log_info "ペイン番号取得中..."
-# tmuxのペイン番号を位置に基づいて取得
-PANE_IDS=($(tmux list-panes -t "agents:agents" -F "#{pane_id}" | sort))
 
-log_info "検出されたペイン: ${PANE_IDS[*]}"
+# デバッグ: ペイン作成結果を詳細表示
+log_info "🔍 デバッグ: ペイン配置詳細"
+tmux list-panes -t "agents:agents" -F "  #{pane_id}: top=#{pane_top} left=#{pane_left}"
+
+# tmuxのペイン番号を物理的な位置に基づいて取得（top, left順でソート）
+PANE_IDS=($(tmux list-panes -t "agents:agents" -F "#{pane_top} #{pane_left} #{pane_id}" | sort -n -k1,1 -k2,2 | awk '{print $3}'))
+
+log_info "検出されたペイン（物理的な位置順）: ${PANE_IDS[*]}"
 
 # ペインタイトル設定とセットアップ
 log_info "ペインタイトル設定中..."
@@ -124,7 +129,7 @@ for i in {0..3}; do
     PANE_ID="${PANE_IDS[$i]}"
     TITLE="${PANE_TITLES[$i]}"
 
-    log_info "設定中: ${TITLE} (${PANE_ID})"
+    log_info "設定中 [$i]: ${TITLE} → ${PANE_ID}"
 
     # ペインタイトル設定
     tmux select-pane -t "$PANE_ID" -T "$TITLE"
@@ -137,6 +142,14 @@ for i in {0..3}; do
 
     # tmux ユーザーオプションとして役割を設定
     tmux set-option -p -t "$PANE_ID" @agent_role "${TITLE}"
+
+    # デバッグ: 設定確認
+    VERIFY=$(tmux show-option -pv -t "$PANE_ID" @agent_role 2>/dev/null)
+    if [ "$VERIFY" = "$TITLE" ]; then
+        log_info "  ✅ @agent_role 設定確認: $VERIFY"
+    else
+        echo "  ⚠️  警告: @agent_role が期待値と異なります (期待: $TITLE, 実際: $VERIFY)"
+    fi
 
     # カラープロンプト設定
     if [ $i -eq 0 ]; then
