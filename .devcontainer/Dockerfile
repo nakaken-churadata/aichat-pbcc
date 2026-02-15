@@ -16,6 +16,21 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+# ロケール設定と日本語フォントのインストール
+RUN apt-get update && apt-get install -y \
+    locales \
+    fonts-noto-cjk \
+    fonts-noto-cjk-extra \
+    && rm -rf /var/lib/apt/lists/* \
+    && sed -i -E 's/# (ja_JP.UTF-8)/\1/' /etc/locale.gen \
+    && sed -i -E 's/# (en_US.UTF-8)/\1/' /etc/locale.gen \
+    && locale-gen
+
+# 環境変数の設定（ロケール）
+ENV LANG=ja_JP.UTF-8 \
+    LC_ALL=ja_JP.UTF-8 \
+    LANGUAGE=ja_JP:en
+
 # gitleaks のインストール（マルチアーキテクチャ対応）
 RUN ARCH=$(dpkg --print-architecture) && \
     if [ "$ARCH" = "amd64" ]; then \
@@ -30,11 +45,14 @@ RUN ARCH=$(dpkg --print-architecture) && \
     mv gitleaks /usr/local/bin/ && \
     rm gitleaks_8.18.1_linux_${GITLEAKS_ARCH}.tar.gz
 
-# Claude Code CLI のインストール（オプショナル）
-# 注: インストールスクリプトが存在しない場合はスキップされます
-# 手動インストールが必要な場合は、docs/devcontainer-setup.md を参照してください
-RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh 2>/dev/null | bash || \
-    echo "⚠️  Claude Code CLI の自動インストールをスキップしました。手動インストールが必要な場合があります。"
+# Claude Code CLI のインストール
+RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh -o /tmp/install-claude.sh \
+    && chmod +x /tmp/install-claude.sh \
+    && bash /tmp/install-claude.sh || echo "⚠️  Claude CLI のインストールをスキップ" \
+    && rm -f /tmp/install-claude.sh
+
+# PATH に追加
+ENV PATH="/home/vscode/.local/bin:${PATH}"
 
 # 作業ディレクトリの設定
 WORKDIR /workspace
