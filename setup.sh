@@ -8,6 +8,17 @@ set -e  # エラー時に停止
 # シェル検出
 CURRENT_SHELL=$(basename "$SHELL")
 
+# devcontainer 環境の検出
+# devcontainer 内では --dangerously-skip-permissions を使用（開発の利便性を優先）
+# ホスト環境では --dangerously-skip-permissions を使用しない（より慎重に操作）
+if [ -f "/.devcontainer_marker" ] || [ "$IN_DEVCONTAINER" = "true" ]; then
+    IN_DEVCONTAINER=true
+    CLAUDE_CMD="claude --dangerously-skip-permissions"
+else
+    IN_DEVCONTAINER=false
+    CLAUDE_CMD="claude"
+fi
+
 # tmuxペインにカラープロンプトを設定する関数
 # Usage: set_color_prompt PANE_ID TITLE COLOR_CODE
 #   COLOR_CODE: 31=red, 34=blue, 35=magenta
@@ -198,6 +209,12 @@ fi
 echo ""
 log_success "🎉 Demo環境セットアップ完了！"
 echo ""
+if [ "$IN_DEVCONTAINER" = "true" ]; then
+    echo "📦 devcontainer 環境を検出しました"
+    echo "  - --dangerously-skip-permissions を使用します（開発の利便性を優先）"
+    echo "  - ⚠️ 注意: ファイル削除などの操作はホストにも影響します"
+    echo ""
+fi
 echo "🔒 セキュリティ機能:"
 echo "  - Pre-commit hook: センシティブ情報を自動検出"
 echo "  - Gitleaks: リポジトリ全体をスキャン"
@@ -210,11 +227,11 @@ echo "     tmux attach-session -t main    # おじいさん確認"
 echo ""
 echo "  2. 🤖 Claude Code起動:"
 echo "     # 手順1: おじいさん認証"
-echo "     tmux send-keys -t main 'claude --dangerously-skip-permissions' C-m"
+echo "     tmux send-keys -t main '$CLAUDE_CMD' C-m"
 echo "     # 手順2: 認証後、agents一括起動"
 echo "     # 各ペインのIDを使用してclaudeを起動"
 echo "     tmux list-panes -t agents:agents -F '#{pane_id}' | while read pane; do"
-echo "         tmux send-keys -t \"\$pane\" 'claude --dangerously-skip-permissions' C-m"
+echo "         tmux send-keys -t \"\$pane\" '$CLAUDE_CMD' C-m"
 echo "     done"
 echo ""
 echo "  3. 📜 指示書確認:"

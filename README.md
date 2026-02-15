@@ -54,6 +54,51 @@ git clone https://github.com/nakaken-churadata/aichat-pbcc.git
 cd aichat-pbcc
 ```
 
+### 0.5. 開発環境の選択（推奨: devcontainer）
+
+このプロジェクトでは、2つの開発環境を提供しています：
+
+#### 🐳 オプションA: devcontainer（推奨）
+**開発の利便性を重視した環境**
+
+- ✅ **`--dangerously-skip-permissions` を使用して開発効率を向上**
+  - ファイルの読み書きやコマンド実行が自由にできる
+  - AI エージェントの能力を最大限に活用
+- ✅ 再現可能な開発環境
+- ✅ チーム全体で統一された環境
+
+**⚠️ 注意事項:**
+- devcontainer 内でも `--dangerously-skip-permissions` を使用するため、危険な操作が可能です
+- プロジェクトディレクトリはホストとマウント共有されるため、ファイル削除などの操作はホストにも影響します
+- 開発の利便性を優先していますが、慎重に操作してください
+
+**前提条件:**
+- VSCode がインストールされている
+- Docker Desktop が起動している
+- Dev Containers 拡張機能がインストールされている
+- Claude Code がホストマシンにインストールされている
+
+**使用方法:**
+1. VSCode でこのプロジェクトを開く
+2. Cmd+Shift+P (Mac) / Ctrl+Shift+P (Windows/Linux) でコマンドパレットを開く
+3. "Dev Containers: Reopen in Container" を選択
+4. コンテナのビルド完了後、下記の「1. tmux環境構築」から続行
+
+詳細: [docs/devcontainer-setup.md](docs/devcontainer-setup.md)
+
+#### 💻 オプションB: ローカル環境
+**より慎重な開発方法**
+
+- ✅ **`--dangerously-skip-permissions` を使用しない**
+  - より安全に Claude Code を使用
+  - 各操作で確認を求められる
+- ✅ セットアップが簡単
+- ✅ Docker 不要
+
+下記の「1. tmux環境構築」から続行
+
+---
+
 ### 1. tmux環境構築
 
 ⚠️ **注意**: 既存の `仲間` と `おじいさん` セッションがある場合は自動的に削除されます。
