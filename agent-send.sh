@@ -85,15 +85,17 @@ log_send() {
 send_message() {
     local target="$1"
     local message="$2"
+    local sender="$3"
 
-    echo "📤 送信中: $target ← '$message'"
+    echo "📤 送信中: $sender → $target"
+    echo "   メッセージ: '$message'"
 
     # Claude Codeのプロンプトを一度クリア
     tmux send-keys -t "$target" C-c
     sleep 0.3
 
-    # メッセージ送信
-    tmux send-keys -t "$target" "$message"
+    # メッセージ送信（送信元を明示）
+    tmux send-keys -t "$target" "【${sender}より】${message}"
     sleep 0.1
 
     # エンター押下
@@ -135,6 +137,17 @@ main() {
     local agent_name="$1"
     local message="$2"
 
+    # 現在のペインのエージェント名を取得
+    local current_pane_id
+    current_pane_id=$(tmux display-message -p "#{pane_id}")
+    local sender
+    sender=$(tmux show-option -p -t "$current_pane_id" "@agent_role")
+
+    # 送信元が不明な場合のフォールバック
+    if [[ -z "$sender" ]]; then
+        sender="不明"
+    fi
+
     # エージェントターゲット取得
     local target
     target=$(get_agent_target "$agent_name")
@@ -151,12 +164,12 @@ main() {
     fi
 
     # メッセージ送信
-    send_message "$target" "$message"
+    send_message "$target" "$message" "$sender"
 
     # ログ記録
     log_send "$agent_name" "$message"
 
-    echo "✅ 送信完了: $agent_name に '$message'"
+    echo "✅ 送信完了: $sender → $agent_name"
 
     return 0
 }
