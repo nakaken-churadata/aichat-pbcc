@@ -28,6 +28,7 @@
   },
   "forwardPorts": [3000, 8080, 8081],
   "postCreateCommand": "npm install -g pnpm && echo 'Dev container ready!'",
+  "postStartCommand": "sudo ./.devcontainer/init-firewall.sh",
   "remoteUser": "node",
   "mounts": [
     "source=${localEnv:HOME}/.claude,target=/home/node/.claude,type=bind,consistency=cached"
@@ -36,6 +37,12 @@
     "AGENT_ROLE": "${localEnv:AGENT_ROLE}"
   },
   "containerEnv": {
-    "IN_DEVCONTAINER": "true"
-  }
+    "IN_DEVCONTAINER": "true",
+    "CLAUDE_CONFIG_DIR": "/home/node/.claude",
+    "NODE_OPTIONS": "--max-old-space-size=4096"
+  },
+  "capAdd": [
+    "NET_ADMIN",
+    "NET_RAW"
+  ]
 }
