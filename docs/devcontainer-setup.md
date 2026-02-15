@@ -1,12 +1,18 @@
 # devcontainer セットアップガイド
 
 ## 概要
-このプロジェクトでは、VSCode の Dev Containers 機能を使用して、安全で再現可能な開発環境を提供しています。devcontainer を使用することで、`--dangerously-skip-permissions` オプションを使用せずに Claude Code を安全に実行できます。
+このプロジェクトでは、VSCode の Dev Containers 機能を使用して、安全で再現可能な開発環境を提供しています。devcontainer を使用することで、**隔離された環境で `--dangerously-skip-permissions` を安全に使用**できます。
 
-## 目的
-- **セキュリティ**: ホストマシンを保護しながら Claude Code を安全に使用
+## 目的と効果
+
+### なぜ devcontainer を使うのか？
+Claude Code を使用する際、`--dangerously-skip-permissions` オプションを使用すると、ファイルの読み書きやコマンド実行が自由にできますが、**ホストマシンで直接使用するとセキュリティリスクがあります**。
+
+devcontainer を使用することで：
+- **隔離された環境**: コンテナ内で `--dangerously-skip-permissions` を使用しても、影響はコンテナ内に限定される
+- **ホストマシンを保護**: 危険な操作がホストマシンに及ばない
+- **安全な開発**: セキュリティリスクを最小限に抑えながら、Claude Code の全機能を使用できる
 - **再現性**: チーム全体で統一された開発環境を提供
-- **隔離性**: コンテナ内で開発を行うことで、ホストマシンへの影響を最小限に抑える
 
 ## 前提条件
 
@@ -14,6 +20,9 @@
 - [VSCode](https://code.visualstudio.com/) がインストールされている
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) がインストールされ、起動している
 - [Dev Containers 拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) がインストールされている
+- **[Claude Code](https://claude.ai/download) がホストマシンにインストールされている**
+  - devcontainer 内からホストの Claude Code を使用します
+  - ホストマシンで Claude Code の認証を完了させてください
 
 ### 推奨
 - 8GB 以上の RAM
@@ -42,11 +51,17 @@ VSCode で以下の手順を実行：
 ### 3. コンテナのビルド
 
 初回起動時は、Docker イメージのビルドに数分かかります。
+
+**コンテナにインストールされるツール:**
 - Node.js 20
 - git、tmux、vim などの開発ツール
 - GitHub CLI (gh)
 - gitleaks
-- Claude Code CLI
+- Claude Code CLI（自動インストールを試行、失敗した場合は手動インストールが必要）
+
+**Claude Code について:**
+- 自動インストールが失敗した場合は、コンテナ内で手動インストールが必要です
+- インストール方法は「Claude Code の手動インストール」セクションを参照してください
 
 ### 4. 開発環境の確認
 
@@ -67,6 +82,7 @@ gitleaks version
 
 # Claude Code の確認
 claude --version
+# 注: エラーが出た場合は、手動インストールが必要です（下記参照）
 ```
 
 ### 5. マルチエージェント環境のセットアップ
@@ -132,13 +148,38 @@ Claude Code の設定とキャッシュを保持するため、ホストマシ�
 2. Docker Desktop の設定でメモリを増やす（推奨: 4GB 以上）
 3. VSCode でコマンドパレットを開き、"Dev Containers: Rebuild Container" を実行
 
+### Claude Code がインストールされていない
+
+**原因**: Claude Code の自動インストールが失敗した
+
+**解決策（手動インストール）**:
+
+コンテナ内のターミナルで以下を実行：
+
+```bash
+# Claude Code の公式インストール方法に従ってください
+# 例: npm を使用する場合
+npm install -g @anthropic-ai/claude-code
+
+# または: curl を使用する場合
+curl -fsSL https://claude.ai/install.sh | bash
+
+# インストール後、確認
+claude --version
+```
+
+**注意**: Claude Code の正式なインストール方法は、公式ドキュメントを確認してください。
+
 ### Claude Code が認証を要求する
 
-**原因**: `~/.claude` ディレクトリがマウントされていない、または認証情報がない
+**原因**: 認証情報がない、または `~/.claude` ディレクトリがマウントされていない
 
 **解決策**:
-1. ホストマシンで Claude Code の認証を完了させる
-2. コンテナを再起動: "Dev Containers: Rebuild Container"
+1. コンテナ内で Claude Code の認証を完了させる:
+   ```bash
+   claude login
+   ```
+2. または、ホストマシンで認証を完了させてからコンテナを再起動
 3. コンテナ内で `ls -la ~/.claude` を実行し、設定ファイルが存在することを確認
 
 ### tmux セッションが起動しない

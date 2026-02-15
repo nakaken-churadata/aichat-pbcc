@@ -59,16 +59,19 @@ cd aichat-pbcc
 このプロジェクトでは、2つの開発環境を提供しています：
 
 #### 🐳 オプションA: devcontainer（推奨）
-**安全で再現可能な開発環境**
+**隔離された環境で安全に開発**
 
-- ✅ `--dangerously-skip-permissions` なしで Claude Code を実行
-- ✅ ホストマシンを保護
+- ✅ **隔離された環境で `--dangerously-skip-permissions` を安全に使用**
+  - ホストマシンへの影響を最小限に抑える
+  - 危険な操作もコンテナ内に限定される
+- ✅ 再現可能な開発環境
 - ✅ チーム全体で統一された環境
 
 **前提条件:**
 - VSCode がインストールされている
 - Docker Desktop が起動している
 - Dev Containers 拡張機能がインストールされている
+- Claude Code がホストマシンにインストールされている
 
 **使用方法:**
 1. VSCode でこのプロジェクトを開く
@@ -79,11 +82,14 @@ cd aichat-pbcc
 詳細: [docs/devcontainer-setup.md](docs/devcontainer-setup.md)
 
 #### 💻 オプションB: ローカル環境
-**従来の開発方法**
+**従来の開発方法（非推奨）**
 
-- ⚠️ `--dangerously-skip-permissions` オプションを使用（セキュリティリスクあり）
+- ⚠️ **セキュリティリスク:** `--dangerously-skip-permissions` をホストマシンで直接使用する必要がある
+- ⚠️ ホストマシンへの影響が大きい
 - ✅ セットアップが簡単
 - ✅ Docker 不要
+
+**注意:** 可能な限り devcontainer（オプションA）の使用を推奨します。
 
 下記の「1. tmux環境構築」から続行
 

@@ -22,9 +22,11 @@ RUN wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks
     && mv gitleaks /usr/local/bin/ \
     && rm gitleaks_8.18.1_linux_x64.tar.gz
 
-# Claude Code CLI のインストール
-# 注: 実際のインストール方法は Claude Code の公式ドキュメントに従ってください
-RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh | bash
+# Claude Code CLI のインストール（オプショナル）
+# 注: インストールスクリプトが存在しない場合はスキップされます
+# 手動インストールが必要な場合は、docs/devcontainer-setup.md を参照してください
+RUN curl -fsSL https://raw.githubusercontent.com/anthropics/claude-code/main/install.sh 2>/dev/null | bash || \
+    echo "⚠️  Claude Code CLI の自動インストールをスキップしました。手動インストールが必要な場合があります。"
 
 # 作業ディレクトリの設定
 WORKDIR /workspace

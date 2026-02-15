@@ -9,12 +9,14 @@ set -e  # エラー時に停止
 CURRENT_SHELL=$(basename "$SHELL")
 
 # devcontainer 環境の検出
+# devcontainer 内では --dangerously-skip-permissions を安全に使用できる（隔離された環境のため）
+# ホスト環境では --dangerously-skip-permissions を使用しない（セキュリティリスクのため）
 if [ -f "/.devcontainer_marker" ] || [ "$IN_DEVCONTAINER" = "true" ]; then
     IN_DEVCONTAINER=true
-    CLAUDE_CMD="claude"
+    CLAUDE_CMD="claude --dangerously-skip-permissions"
 else
     IN_DEVCONTAINER=false
-    CLAUDE_CMD="claude --dangerously-skip-permissions"
+    CLAUDE_CMD="claude"
 fi
 
 # tmuxペインにカラープロンプトを設定する関数
@@ -209,7 +211,8 @@ log_success "🎉 Demo環境セットアップ完了！"
 echo ""
 if [ "$IN_DEVCONTAINER" = "true" ]; then
     echo "📦 devcontainer 環境を検出しました"
-    echo "  - Claude Code は通常モードで実行されます（安全）"
+    echo "  - 隔離された環境で --dangerously-skip-permissions を安全に使用します"
+    echo "  - ホストマシンへの影響を最小限に抑えます"
     echo ""
 fi
 echo "🔒 セキュリティ機能:"
