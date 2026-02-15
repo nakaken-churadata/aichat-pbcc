@@ -1,18 +1,23 @@
 # devcontainer セットアップガイド
 
 ## 概要
-このプロジェクトでは、VSCode の Dev Containers 機能を使用して、安全で再現可能な開発環境を提供しています。devcontainer を使用することで、**隔離された環境で `--dangerously-skip-permissions` を安全に使用**できます。
+このプロジェクトでは、VSCode の Dev Containers 機能を使用して、再現可能な開発環境を提供しています。devcontainer を使用することで、**開発の利便性を重視しながら `--dangerously-skip-permissions` を使用**できます。
 
 ## 目的と効果
 
 ### なぜ devcontainer を使うのか？
-Claude Code を使用する際、`--dangerously-skip-permissions` オプションを使用すると、ファイルの読み書きやコマンド実行が自由にできますが、**ホストマシンで直接使用するとセキュリティリスクがあります**。
+Claude Code を使用する際、`--dangerously-skip-permissions` オプションを使用すると、ファイルの読み書きやコマンド実行が自由にできるため、AI エージェントの能力を最大限に活用できます。
 
 devcontainer を使用することで：
-- **隔離された環境**: コンテナ内で `--dangerously-skip-permissions` を使用しても、影響はコンテナ内に限定される
-- **ホストマシンを保護**: 危険な操作がホストマシンに及ばない
-- **安全な開発**: セキュリティリスクを最小限に抑えながら、Claude Code の全機能を使用できる
+- **開発の利便性向上**: `--dangerously-skip-permissions` を使用して効率的に開発
 - **再現性**: チーム全体で統一された開発環境を提供
+- **ホスト環境との分離**: ホスト環境では `--dangerously-skip-permissions` を使用せず、より慎重に操作
+
+**⚠️ 重要な注意事項:**
+- devcontainer 内でも `--dangerously-skip-permissions` を使用するため、危険な操作が可能です
+- **プロジェクトディレクトリはホストとマウント共有されるため、ファイル削除などの操作はホストにも影響します**
+- 完全な安全性を保証するものではありません
+- 開発の利便性を優先していますが、慎重に操作してください
 
 ## 前提条件
 

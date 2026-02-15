@@ -9,8 +9,8 @@ set -e  # エラー時に停止
 CURRENT_SHELL=$(basename "$SHELL")
 
 # devcontainer 環境の検出
-# devcontainer 内では --dangerously-skip-permissions を安全に使用できる（隔離された環境のため）
-# ホスト環境では --dangerously-skip-permissions を使用しない（セキュリティリスクのため）
+# devcontainer 内では --dangerously-skip-permissions を使用（開発の利便性を優先）
+# ホスト環境では --dangerously-skip-permissions を使用しない（より慎重に操作）
 if [ -f "/.devcontainer_marker" ] || [ "$IN_DEVCONTAINER" = "true" ]; then
     IN_DEVCONTAINER=true
     CLAUDE_CMD="claude --dangerously-skip-permissions"
@@ -211,8 +211,8 @@ log_success "🎉 Demo環境セットアップ完了！"
 echo ""
 if [ "$IN_DEVCONTAINER" = "true" ]; then
     echo "📦 devcontainer 環境を検出しました"
-    echo "  - 隔離された環境で --dangerously-skip-permissions を安全に使用します"
-    echo "  - ホストマシンへの影響を最小限に抑えます"
+    echo "  - --dangerously-skip-permissions を使用します（開発の利便性を優先）"
+    echo "  - ⚠️ 注意: ファイル削除などの操作はホストにも影響します"
     echo ""
 fi
 echo "🔒 セキュリティ機能:"
