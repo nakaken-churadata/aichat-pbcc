@@ -31,3 +31,6 @@ Thumbs.db
 # ログ
 *.log
 logs/
+
+# Next.js auto-generated
+next-env.d.ts
