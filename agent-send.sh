@@ -90,10 +90,6 @@ send_message() {
     echo "📤 送信中: $sender → $target"
     echo "   メッセージ: '$message'"
 
-    # Claude Codeのプロンプトを一度クリア
-    tmux send-keys -t "$target" C-c
-    sleep 0.3
-
     # メッセージ送信（送信元を明示）
     tmux send-keys -t "$target" "【${sender}より】${message}"
     sleep 0.1
