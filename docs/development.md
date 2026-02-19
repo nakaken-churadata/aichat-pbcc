@@ -1,8 +1,8 @@
-# 開発環境
+# 開発環境（エージェント型コーディング）
 
 ## 概要
 
-このプロジェクトの開発環境セットアップ方法を説明します。2つの開発方法があります：
+Claude Code を使ったエージェント型コーディングの開発環境セットアップ方法を説明します。2つのセットアップ方法があります：
 
 | 方法 | 推奨度 | 特徴 |
 |------|--------|------|
@@ -29,14 +29,40 @@
 
 ### オプションA: devcontainer（推奨）
 
-devcontainerの詳細なセットアップ手順は [devcontainer-setup.md](devcontainer-setup.md) を参照してください。
+VSCode Dev Containers を使用した再現可能な開発環境です。`--dangerously-skip-permissions` を安全に使用するためのコンテナ分離環境を提供します。
 
-概要：
+#### セットアップ手順
+
 1. Docker Desktop を起動
 2. VSCode でプロジェクトを開く
 3. コマンドパレットから "Dev Containers: Reopen in Container" を実行
 4. コンテナのビルドを待つ（初回は数分かかります）
 5. コンテナ内のターミナルで以下の手順を続行
+
+#### devcontainer の構成
+
+```
+ホストマシン
+├── VSCode (Dev Containers拡張機能)
+├── Docker Desktop
+└── Claude Code (ホストにインストール)
+    │
+    └──► devcontainer
+         ├── Node.js 20
+         ├── git, tmux, vim
+         ├── GitHub CLI (gh)
+         ├── gitleaks
+         └── Claude Code CLI
+```
+
+#### ボリュームマウント・転送ポート
+
+| ホスト | コンテナ | 用途 |
+|--------|----------|------|
+| `~/.claude` | `~/.claude` | Claude Code 認証情報の共有 |
+| プロジェクトディレクトリ | プロジェクトディレクトリ | ソースコードの共有 |
+
+詳細設定は [references/devcontainer-setup.md](references/devcontainer-setup.md) を参照してください。
 
 ### オプションB: ローカル環境
 
@@ -146,27 +172,10 @@ git worktree add worktrees/feature-issue-XX -b feature/issue-XX-description
 echo $AGENT_ROLE
 ```
 
-詳細な分析と対策は `docs/agent-role-fix-plan.md` を参照してください。
+詳細な分析と対策は [references/agent-role-fix-plan.md](references/agent-role-fix-plan.md) を参照してください。
 
 ### devcontainer で Claude Code が強制終了する
 
-`docs/devcontainer-claude-fix-proposal.md` を参照してください。主な対策：
-- npmパッケージでのインストール: `npm install -g @anthropic-ai/claude-code`
-- `NET_ADMIN`, `NET_RAW` capabilityの付与
-
-### CORSエラーが発生する
-
-バックエンドの `ALLOWED_ORIGINS` 環境変数が正しく設定されているか確認：
-
-```bash
-# docker-compose の場合
-# docker-compose.yml の backend.environment.ALLOWED_ORIGINS を確認
-```
-
-### Gemini API エラー
-
-`GEMINI_API_KEY` が正しく設定されているか確認：
-
-```bash
-echo $GEMINI_API_KEY
-```
+[references/devcontainer-claude-fix-proposal.md](references/devcontainer-claude-fix-proposal.md) を参照してください。主な対策：
+- npm パッケージでのインストール: `npm install -g @anthropic-ai/claude-code`
+- `NET_ADMIN`, `NET_RAW` capability の付与

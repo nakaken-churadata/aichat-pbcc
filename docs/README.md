@@ -12,11 +12,10 @@
 
 **[architecture.md](architecture.md)**
 
-チャットアプリケーションおよびマルチエージェント開発システムのアーキテクチャを説明します。
+**aichat** のアーキテクチャを説明します。
 
 - ブラウザ → フロントエンド → バックエンド → 生成AI の階層構造
-- 各階層の役割・連携方法・使用技術
-- エージェント構成（おじいさん・桃太郎・お供たち）
+- 各階層の役割・連携方法・使用技術（Next.js, Gemini API）
 
 ---
 
@@ -24,10 +23,9 @@
 
 **[infrastructure.md](infrastructure.md)**
 
-各環境のセットアップ方法・使用技術・運用方法を説明します。
+**aichat** のインフラ環境を説明します。
 
-- **ローカル環境**: Docker Compose によるローカル開発
-- **devcontainer**: VSCode Dev Containers を使った推奨開発環境（詳細: [devcontainer-setup.md](devcontainer-setup.md)）
+- **ローカル環境**: Docker Compose によるローカル動作確認
 - **クラウド環境**: Google Cloud Run へのデプロイ（Terraform 使用）
 
 ---
@@ -36,12 +34,11 @@
 
 **[development.md](development.md)**
 
-開発環境の構築方法・ツール一覧・開発フローを説明します。
+**エージェント型コーディング**（Claude Code を使った開発）のローカルマシンセットアップを説明します。
 
-- Mac / Windows 別のセットアップ手順
-- 使用ツール一覧（Node.js, git, tmux, GitHub CLI, gitleaks, Claude Code）
-- マルチエージェント環境の起動方法
-- トラブルシューティング
+- devcontainer（推奨）・ローカル環境 別のセットアップ手順
+- 使用ツール一覧（tmux, GitHub CLI, gitleaks, Claude Code）
+- マルチエージェント環境の起動方法・開発フロー
 
 ---
 
@@ -51,7 +48,7 @@
 
 上記3カテゴリに当てはまらないドキュメントの索引です。
 
-- エージェント通信ガイドライン（[message-guidelines.md](message-guidelines.md)）
-- セキュリティガイドライン（[security-guidelines.md](security-guidelines.md)）
-- 技術的な問題分析・提案ドキュメント
-- 調査レポート（`investigations/` ディレクトリ）
+- エージェント通信ガイドライン（[references/message-guidelines.md](references/message-guidelines.md)）
+- セキュリティガイドライン（[references/security-guidelines.md](references/security-guidelines.md)）
+- 技術的な問題分析・提案ドキュメント（`references/`）
+- 調査レポート（`investigations/`）
