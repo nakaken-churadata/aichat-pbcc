@@ -2,6 +2,10 @@
 
 # 🚀 Agent間メッセージ送信スクリプト
 
+# スクリプトディレクトリ（絶対パス）
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+QUEUE_DIR="$SCRIPT_DIR/queue"
+
 # エージェント→tmuxターゲット マッピング（ユーザーオプションベース）
 get_agent_target() {
     local agent_name="$1"
@@ -35,6 +39,8 @@ show_usage() {
 使用方法:
   $0 [エージェント名] [メッセージ]
   $0 --list
+  $0 --show-queue [エージェント名]
+  $0 --retry-queue [エージェント名]
 
 利用可能エージェント:
   おじいさん - プロジェクト統括責任者
@@ -47,6 +53,8 @@ show_usage() {
   $0 おじいさん "指示書に従って"
   $0 桃太郎 "Hello World プロジェクト開始指示"
   $0 お供の犬 "作業完了しました"
+  $0 --show-queue お供の犬
+  $0 --retry-queue お供の犬
 EOF
 }
 
@@ -77,8 +85,141 @@ log_send() {
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
-    mkdir -p logs
-    echo "[$timestamp] $agent: SENT - \"$message\"" >> logs/send_log.txt
+    mkdir -p "$SCRIPT_DIR/logs"
+    echo "[$timestamp] $agent: SENT - \"$message\"" >> "$SCRIPT_DIR/logs/send_log.txt"
+}
+
+# キュー: メッセージIDを生成
+generate_msg_id() {
+    echo "$(date '+%Y%m%d%H%M%S')_$$_$RANDOM"
+}
+
+# キュー: メッセージを追加（ペンディング状態）
+enqueue_message() {
+    local agent="$1"
+    local sender="$2"
+    local message="$3"
+
+    local agent_queue_dir="$QUEUE_DIR/$agent"
+    mkdir -p "$agent_queue_dir"
+
+    local msg_id
+    msg_id=$(generate_msg_id)
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    # メッセージファイルに記録（--- 以降がメッセージ本文）
+    printf "SENDER: %s\nTIMESTAMP: %s\n---\n%s" "$sender" "$timestamp" "$message" \
+        > "$agent_queue_dir/${msg_id}.pending"
+
+    echo "$msg_id"
+}
+
+# キュー: 配信完了としてマーク（.pending → .delivered にリネーム）
+dequeue_message() {
+    local agent="$1"
+    local msg_id="$2"
+
+    local pending_file="$QUEUE_DIR/$agent/${msg_id}.pending"
+    if [[ -f "$pending_file" ]]; then
+        mv "$pending_file" "$QUEUE_DIR/$agent/${msg_id}.delivered"
+    fi
+}
+
+# キュー: ペンディングメッセージを表示
+show_queue() {
+    local agent="$1"
+    local agent_queue_dir="$QUEUE_DIR/$agent"
+
+    if [[ ! -d "$agent_queue_dir" ]]; then
+        echo "📭 キュー: ${agent} のペンディングメッセージなし"
+        return 0
+    fi
+
+    local has_pending=false
+    for msg_file in "$agent_queue_dir"/*.pending; do
+        [[ -e "$msg_file" ]] || continue
+        has_pending=true
+        break
+    done
+
+    if [[ "$has_pending" == "false" ]]; then
+        echo "📭 キュー: ${agent} のペンディングメッセージなし"
+        return 0
+    fi
+
+    echo "📬 キュー: ${agent} のペンディングメッセージ:"
+    for msg_file in "$agent_queue_dir"/*.pending; do
+        [[ -e "$msg_file" ]] || continue
+        local msg_id
+        msg_id=$(basename "$msg_file" .pending)
+        local sender
+        sender=$(grep '^SENDER: ' "$msg_file" | sed 's/^SENDER: //')
+        local timestamp
+        timestamp=$(grep '^TIMESTAMP: ' "$msg_file" | sed 's/^TIMESTAMP: //')
+        local message
+        message=$(awk '/^---$/{found=1; next} found{print}' "$msg_file")
+        echo "  [${msg_id}] ${timestamp} from ${sender}: ${message}"
+    done
+}
+
+# キュー: ペンディングメッセージを再送
+retry_queue() {
+    local agent="$1"
+    local agent_queue_dir="$QUEUE_DIR/$agent"
+
+    if [[ ! -d "$agent_queue_dir" ]]; then
+        echo "📭 リトライ不要: ${agent} のペンディングメッセージなし"
+        return 0
+    fi
+
+    local has_pending=false
+    for msg_file in "$agent_queue_dir"/*.pending; do
+        [[ -e "$msg_file" ]] || continue
+        has_pending=true
+        break
+    done
+
+    if [[ "$has_pending" == "false" ]]; then
+        echo "📭 リトライ不要: ${agent} のペンディングメッセージなし"
+        return 0
+    fi
+
+    local target
+    target=$(get_agent_target "$agent")
+    if [[ -z "$target" ]]; then
+        echo "❌ エラー: ${agent} のペインが見つかりません。再送をスキップします"
+        return 1
+    fi
+
+    if ! check_target "$target"; then
+        return 1
+    fi
+
+    echo "🔄 キュー再送: ${agent}"
+
+    for msg_file in "$agent_queue_dir"/*.pending; do
+        [[ -e "$msg_file" ]] || continue
+        local msg_id
+        msg_id=$(basename "$msg_file" .pending)
+        local sender
+        sender=$(grep '^SENDER: ' "$msg_file" | sed 's/^SENDER: //')
+        local message
+        message=$(awk '/^---$/{found=1; next} found{print}' "$msg_file")
+
+        echo "  📤 再送: [${msg_id}] ${message}"
+
+        tmux send-keys -t "$target" "【${sender}より】${message}"
+        sleep 0.1
+        tmux send-keys -t "$target" C-m
+        sleep 0.5
+
+        # 配信完了としてマーク
+        mv "$msg_file" "$agent_queue_dir/${msg_id}.delivered"
+        echo "  ✅ 再送完了: [${msg_id}]"
+    done
+
+    echo "✅ キュー再送完了"
 }
 
 # メッセージ送信
@@ -86,13 +227,14 @@ send_message() {
     local target="$1"
     local message="$2"
     local sender="$3"
+    local agent_name="$4"
 
     echo "📤 送信中: $sender → $target"
     echo "   メッセージ: '$message'"
 
-    # Claude Codeのプロンプトを一度クリア
-    tmux send-keys -t "$target" C-c
-    sleep 0.3
+    # キューに追加（未配信として記録）
+    local msg_id
+    msg_id=$(enqueue_message "$agent_name" "$sender" "$message")
 
     # メッセージ送信（送信元を明示）
     tmux send-keys -t "$target" "【${sender}より】${message}"
@@ -101,6 +243,9 @@ send_message() {
     # エンター押下
     tmux send-keys -t "$target" C-m
     sleep 0.5
+
+    # 配信完了としてキューから移動
+    dequeue_message "$agent_name" "$msg_id"
 }
 
 # ターゲット存在確認
@@ -126,6 +271,26 @@ main() {
     # --listオプション
     if [[ "$1" == "--list" ]]; then
         show_agents
+        exit 0
+    fi
+
+    # --show-queue オプション
+    if [[ "$1" == "--show-queue" ]]; then
+        if [[ $# -lt 2 ]]; then
+            echo "使用方法: $0 --show-queue [エージェント名]"
+            exit 1
+        fi
+        show_queue "$2"
+        exit 0
+    fi
+
+    # --retry-queue オプション
+    if [[ "$1" == "--retry-queue" ]]; then
+        if [[ $# -lt 2 ]]; then
+            echo "使用方法: $0 --retry-queue [エージェント名]"
+            exit 1
+        fi
+        retry_queue "$2"
         exit 0
     fi
 
@@ -170,7 +335,7 @@ main() {
     fi
 
     # メッセージ送信
-    send_message "$target" "$message" "$sender"
+    send_message "$target" "$message" "$sender" "$agent_name"
 
     # ログ記録
     log_send "$agent_name" "$message"
