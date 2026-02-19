@@ -1,15 +1,16 @@
-# インフラストラクチャ
+# インフラストラクチャ（aichat）
 
 ## 概要
 
-このプロジェクトは、ローカル・Docker (devcontainer)・クラウド (Google Cloud Run) の3つの環境をサポートしています。
+aichat は、ローカル (Docker Compose) とクラウド (Google Cloud Run) の2つの環境をサポートしています。
+
+> **注**: devcontainer はエージェント型コーディングの開発環境です。[development.md](development.md) を参照してください。
 
 ## 環境一覧
 
 | 環境 | 用途 | 主な技術 |
 |------|------|----------|
-| ローカル (Docker Compose) | 開発・動作確認 | Docker, Docker Compose |
-| devcontainer (VSCode) | 推奨開発環境 | VSCode Dev Containers, Docker |
+| ローカル (Docker Compose) | 動作確認・開発 | Docker, Docker Compose |
 | クラウド (Google Cloud) | 本番デプロイ | Cloud Run, Artifact Registry, Secret Manager, Terraform |
 
 ---
@@ -48,55 +49,6 @@ docker-compose up
 | `GEMINI_API_KEY` | backend | Google Gemini APIキー |
 | `ALLOWED_ORIGINS` | backend | CORS許可オリジン |
 | `NEXT_PUBLIC_API_URL` | frontend | バックエンドURL |
-
----
-
-## devcontainer 環境
-
-devcontainerの詳細なセットアップ手順は [devcontainer-setup.md](devcontainer-setup.md) を参照してください。
-
-### 概要
-
-VSCode Dev Containers を使用した再現可能な開発環境です。`--dangerously-skip-permissions` を安全に使用するためのコンテナ分離環境を提供します。
-
-### 構成
-
-```
-ホストマシン
-├── VSCode (Dev Containers拡張機能)
-├── Docker Desktop
-└── Claude Code (ホストにインストール)
-    │
-    └──► devcontainer
-         ├── Node.js 20
-         ├── git, tmux, vim
-         ├── GitHub CLI (gh)
-         ├── gitleaks
-         └── Claude Code CLI
-```
-
-### ボリュームマウント
-
-| ホスト | コンテナ | 用途 |
-|--------|----------|------|
-| `~/.claude` | `~/.claude` | Claude Code認証情報の共有 |
-| プロジェクトディレクトリ | プロジェクトディレクトリ | ソースコードの共有 |
-
-### 転送ポート
-
-| ポート | 用途 |
-|--------|------|
-| 3000 | フロントエンド開発サーバー |
-| 8080 | バックエンド開発サーバー（代替） |
-| 8081 | バックエンド API サーバー |
-
-### 既知の問題と対策
-
-devcontainer内でClaude Codeの強制終了が発生した場合は [devcontainer-claude-fix-proposal.md](devcontainer-claude-fix-proposal.md) を参照してください。主な原因：
-
-- Claude Codeのインストール方法（npmパッケージを推奨）
-- ファイアウォール設定の欠如（`NET_ADMIN`, `NET_RAW` capabilityが必要）
-- `~/.claude` のバインドマウント設定
 
 ---
 
@@ -162,10 +114,3 @@ terraform destroy
 | `ALLOWED_ORIGINS` | 環境変数 | backend |
 | `NEXT_PUBLIC_API_URL` | ビルド時引数 | frontend |
 
----
-
-## マルチアーキテクチャ対応
-
-devcontainerおよびDockerイメージは、Intel Mac (x86_64) と Appleシリコン Mac (ARM64) の両方に対応しています。
-
-`Dockerfile` 内で `dpkg --print-architecture` を使用してアーキテクチャを自動検出し、適切なバイナリをダウンロードします。

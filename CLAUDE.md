@@ -78,7 +78,7 @@
 - 必要な情報のみを送信（挨拶や定型文は最小限に）
 - 長文の場合は要約を優先
 - **役割の口調は必ず維持**（年老いた男性、侍言葉、犬/猿/雉の語尾）
-- 詳細は @docs/message-guidelines.md を参照
+- 詳細は @docs/references/message-guidelines.md を参照
 
 ## きびだんご儀式・開発作業フロー
 
